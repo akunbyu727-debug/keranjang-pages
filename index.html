@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rekomendasi Outfit — Keranjang</title>
+  <meta name="description" content="Daftar produk bernomor, cari dengan nomor atau kata kunci. Dibangun di GitHub Pages (statis)." />
+  <style>
+    :root{
+      --accent:#ff7a3d; --accent2:#ff9550; --bg:#0f172a; --card:#ffffff; --muted:#6b7280; --shadow:0 8px 30px rgba(2,6,23,.12);
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#0f172a}
+    .wrap{max-width:900px;margin:0 auto;padding:20px}
+    .hero{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0b1220;border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+    .hero h1{margin:0 0 6px;font-size:20px} .hero p{margin:0;opacity:.9}
+    .search{display:flex;align-items:center;gap:8px;margin:14px 0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:10px 12px}
+    .search input{border:0;outline:0;width:100%;font-size:15px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+    .img{aspect-ratio:1/1;background:#f8fafc;display:grid;place-items:center}
+    .img img{width:100%;height:100%;object-fit:cover}
+    .body{padding:10px 12px}
+    .no{position:absolute;margin:8px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:4px 8px;font-weight:800}
+    .ttl{margin:0 0 4px;font-size:14px}
+    .muted{color:var(--muted);font-size:12px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 10px;border-radius:10px;border:1px solid #111;background:#fff;font-weight:700;text-decoration:none;color:#111}
+    .btn.primary{background:var(--accent);border-color:#d45c21;color:#000}
+    header{position:sticky;top:0;z-index:10;background:rgba(15,23,42,.75);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.1)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="hero">
+        <h1>👗 Rekomendasi Outfit</h1>
+        <p>Inspirasi outfit kamu. Cari berdasar nomor: "856", "364" atau kata kunci.</p>
+      </div>
+      <label class="search">
+        <span>🔎</span>
+        <input id="q" placeholder="Cari produk… (judul/#tag/nomor)" />
+      </label>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <template id="card-tpl">
+    <article class="card">
+      <div class="img"><span>no img</span></div>
+      <div class="body">
+        <span class="no">#00</span>
+        <h3 class="ttl">Judul</h3>
+        <div class="muted price">Rp0</div>
+        <div class="muted tags"></div>
+        <div class="actions">
+          <a class="btn primary" target="_blank" rel="noopener">Keranjang</a>
+          <button class="btn copy">Salin Link</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+  const grid = document.getElementById('grid');
+  const q = document.getElementById('q');
+  const params = new URLSearchParams(location.search);
+  if(params.get('q')) q.value = params.get('q');
+
+  // Ambil data dari products.json (harus ada di root repo)
+  async function load(){
+    const res = await fetch('products.json?'+Date.now());
+    const data = await res.json();
+    return Array.isArray(data) ? data : data.items || [];
+  }
+
+  function moneyNum(x){return Number((x||'').toString().replace(/[^\d]/g,''))||0}
+
+  function match(p,kw){
+    kw = kw.toLowerCase();
+    if(!kw) return true;
+    return (
+      p.name?.toLowerCase().includes(kw) ||
+      (p.tags||[]).some(t=>t.toLowerCase().includes(kw)) ||
+      String(p.no||'').padStart(3,'0')===kw ||
+      String(p.no||'')===kw
+    );
+  }
+
+  function render(list){
+    grid.innerHTML = '';
+    const tpl = document.getElementById('card-tpl');
+    list.forEach(p=>{
+      const node = tpl.content.cloneNode(true);
+      node.querySelector('.no').textContent = `#${String(p.no).padStart(2,'0')}`;
+      node.querySelector('.ttl').textContent = p.name || 'Tanpa judul';
+      node.querySelector('.price').textContent = p.price||'';
+      node.querySelector('.btn.primary').href = p.link;
+      node.querySelector('.copy').addEventListener('click',async(e)=>{
+        try{await navigator.clipboard.writeText(p.link); e.target.textContent='Tersalin ✓'; setTimeout(()=>e.target.textContent='Salin Link',1200);}catch(err){alert('Gagal menyalin');}
+      });
+      const tg = (p.tags||[]).join(' ');
+      node.querySelector('.tags').textContent = tg;
+      const imgBox = node.querySelector('.img');
+      if(p.image){
+        const im = new Image(); im.loading='lazy'; im.alt=p.name||''; im.src=p.image; imgBox.innerHTML=''; imgBox.appendChild(im);
+      }
+      grid.appendChild(node);
+    });
+  }
+
+  let PRODUCTS = [];
+  load().then(data=>{
+    // Normalisasi: urutkan by no (default)
+    PRODUCTS = data.sort((a,b)=> (a.no||0)-(b.no||0));
+    filter();
+  });
+
+  function filter(){
+    const kw = q.value.trim();
+    const out = PRODUCTS.filter(p=>match(p,kw));
+    render(out);
+    params.set('q', kw); history.replaceState({},'',`?${params.toString()}`);
+  }
+  q.addEventListener('input', filter);
+  </script>
+</body>
+</html>

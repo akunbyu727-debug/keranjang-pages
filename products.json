@@ -1,0 +1,28 @@
+[
+  {
+    "id": "seed-1",
+    "no": 1,
+    "name": "Lulu Blouse Embos Chic Crepe",
+    "link": "https://s.shopee.co.id/AAAA",
+    "image": "https://i.imgur.com/6n2a9v1.jpeg",
+    "price": "Rp79.000",
+    "tags": [
+      "#blouse",
+      "#fashionwanita"
+    ],
+    "created_at": "2025-10-01 08:41:13"
+  },
+  {
+    "id": "seed-2",
+    "no": 2,
+    "name": "Celana Chino Slim Fit",
+    "link": "https://s.shopee.co.id/BBBB",
+    "image": "https://i.imgur.com/6Zr1lT9.jpeg",
+    "price": "Rp99.000",
+    "tags": [
+      "#celanapria",
+      "#ootd"
+    ],
+    "created_at": "2025-10-01 08:41:33"
+  }
+]
