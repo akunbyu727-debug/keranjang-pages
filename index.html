@@ -12,9 +12,8 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--txt);
          font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-    header{padding:16px;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#fff;
-      font-weight:700; text-align:center}
+    header{padding:16px;background:linear-gradient(90deg,var(--brand1),var(--brand2));
+           color:#fff;font-weight:700;text-align:center}
     .wrap{max-width:960px;margin:16px auto;padding:0 12px}
     .search{width:100%;background:#0f141a;border:1px solid var(--stroke);
             color:var(--txt);border-radius:999px;padding:12px 16px;margin:10px 0}
@@ -31,9 +30,8 @@
     .chip{display:inline-block;background:#223045;border:1px solid var(--stroke);
           color:#b9c4d0;padding:2px 8px;border-radius:999px;margin-right:6px;font-size:11px}
     .empty{color:var(--muted);text-align:center;padding:40px}
-    footer{position:fixed;right:16px;bottom:16px;background:#1f6feb;
-      color:#fff;padding:10px 14px;border-radius:999px;font-weight:700;
-      box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    footer{position:fixed;right:16px;bottom:16px;background:#1f6feb;color:#fff;
+           padding:10px 14px;border-radius:999px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.25)}
   </style>
 </head>
 <body>
@@ -41,89 +39,98 @@
   <div class="wrap">
     <input id="q" class="search" placeholder="Cari produk / tag…"/>
     <div id="list" class="grid"></div>
-    <div id="empty" class="empty" hidden>Belum ada produk.</div>
+    <div id="empty" class="empty" hidden>Gagal memuat data.</div>
   </div>
-  <a class="wa" href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s" target="_blank" rel="noopener" style="text-decoration:none;">
+  <a href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s" target="_blank" rel="noopener" style="text-decoration:none;">
     <footer>Channel WA</footer>
   </a>
 
   <script>
-    // ---- DATA SOURCE ----
-    // Pakai data JSON lama kamu atau CSV->JSON dari Sheet.
-    // Format item minimal: { no, name, link, image, tags }
-    const DATA_URL = 'products.json'; // <- atau endpoint fetch sheet kamu
+    // ==== GANTI ke URL CSV Sheet kamu ====
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
 
     const $ = s => document.querySelector(s);
-    const $list = $('#list');
-    const $empty = $('#empty');
-    const $q = $('#q');
+    const $list = $('#list'), $empty = $('#empty'), $q = $('#q');
+    let ALL = [];
 
-    // Helper: deep-link ke app Shopee + fallback web
+    // Baca CSV → array object {no,name,link,image,tags,price}
+    async function loadCSV(url){
+      const res = await fetch(url + '&t=' + Date.now());
+      if(!res.ok) throw new Error(res.status+' '+res.statusText);
+      const text = await res.text();
+      const rows = text.trim().split(/\r?\n/).map(line =>
+        line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/) // split CSV aman untuk kolom ber-quote
+      );
+      const [hdr, ...data] = rows;
+      const idx = Object.fromEntries(hdr.map((h,i)=>[h.trim().toLowerCase(), i]));
+      return data.map(r => {
+        const pick = k => (r[idx[k]]||'').replace(/^"|"$/g,'').trim();
+        return {
+          no: pick('no'),
+          name: pick('name'),
+          link: pick('link'),
+          image: pick('image'),
+          price: pick('price'),
+          tags: pick('tags')
+        };
+      }).filter(x => x.link);
+    }
+
+    // Deep-link ke app Shopee + fallback web
     function openShopee(link){
-      // Kalau sudah shortlink/URL Shopee, langsung pakai.
-      const web = link;
-      // Deep-link generik: app akan baca url param
-      const app = 'shopee://open?url=' + encodeURIComponent(web);
-
-      // Trik “attempt then fallback”
+      const app = 'shopee://open?url=' + encodeURIComponent(link);
       const t = Date.now();
       const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = app;
+      iframe.style.display='none'; iframe.src = app;
       document.body.appendChild(iframe);
-
-      // Fallback ke web bila app tidak menangkap dalam ~700ms
-      setTimeout(() => {
-        const elapsed = Date.now() - t;
-        if (elapsed < 1500) window.open(web, '_blank', 'noopener');
-        setTimeout(() => iframe.remove(), 1000);
-      }, 700);
+      setTimeout(()=>{
+        if(Date.now()-t < 1500) window.open(link,'_blank','noopener');
+        setTimeout(()=>iframe.remove(), 1000);
+      },700);
     }
 
     function cardHtml(p){
       const chips = (p.tags||'').split(',').map(s=>s.trim()).filter(Boolean)
-                    .slice(0,2).map(s=>`<span class="chip">${s}</span>`).join('');
+                     .slice(0,2).map(s=>`<span class="chip">${s}</span>`).join('');
       return `
         <article class="card" data-link="${encodeURIComponent(p.link)}" tabindex="0" role="button" aria-label="${p.name}">
-          <img class="thumb" loading="lazy" src="${p.image||''}" alt="${p.name}">
+          <img class="thumb" loading="lazy" src="${p.image || 'https://via.placeholder.com/600x600?text=No+Image'}" alt="${p.name}">
           <div class="body">
-            <span class="title">${p.no ? '#'+p.no+' ' : ''}${p.name}</span>
+            <span class="title">${p.no ? '#'+p.no+' ' : ''}${p.name || 'Produk'}</span>
             <div class="meta">${chips}</div>
           </div>
         </article>`;
     }
 
     function render(items){
-      if (!items.length){ $list.innerHTML=''; $empty.hidden=false; return; }
+      if(!items.length){ $list.innerHTML=''; $empty.hidden=false; return; }
       $empty.hidden = true;
       $list.innerHTML = items.map(cardHtml).join('');
-      // Delegasi klik → buka Shopee
       $list.querySelectorAll('.card').forEach(el=>{
         const link = decodeURIComponent(el.getAttribute('data-link'));
         el.addEventListener('click', ()=>openShopee(link));
-        el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') openShopee(link); });
+        el.addEventListener('keydown', e=>{
+          if(e.key==='Enter'||e.key===' ') openShopee(link);
+        });
       });
     }
 
-    // Pencarian sederhana (nama/tags)
     function filter(items, q){
-      q = q.trim().toLowerCase();
-      if (!q) return items;
+      q = (q||'').toLowerCase();
+      if(!q) return items;
       return items.filter(p =>
         String(p.name||'').toLowerCase().includes(q) ||
         String(p.tags||'').toLowerCase().includes(q) ||
-        String(p.no||'').toString().includes(q)
+        String(p.no||'').toLowerCase().includes(q)
       );
     }
 
-    // Load data
-    let ALL = [];
-    fetch(DATA_URL, {cache:'no-store'})
-      .then(r => r.json())
-      .then(js => { ALL = js; render(ALL); })
-      .catch(()=>{ $empty.hidden=false; $empty.textContent='Gagal memuat data.'; });
+    // Load & init
+    loadCSV(SHEET_CSV_URL)
+      .then(data => { ALL = data; render(ALL); })
+      .catch(err => { $empty.hidden=false; $empty.textContent='Gagal memuat data.'; console.error(err); });
 
-    $q.addEventListener('input', () => render(filter(ALL, $q.value)));
+    $q.addEventListener('input', ()=>render(filter(ALL, $q.value)));
   </script>
 </body>
 </html>
