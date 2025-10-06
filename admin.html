@@ -1,95 +1,122 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Keranjang — Tambah dari Link Shopee</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-      background: #0d1117;
-      color: #f5f5f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 40px 20px;
+    :root{
+      --bg:#0d1117; --card:#161b22; --txt:#e6edf3; --muted:#9da7b3;
+      --brand1:#ff7b00; --brand2:#ff9100; --ok:#4caf50; --err:#ff5252;
+      --stroke:#2a313a;
     }
-    h1 {
-      color: #ffa24a;
-      margin-bottom: 10px;
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--txt); display:flex; min-height:100svh;
+      align-items:flex-start; justify-content:center; padding:32px 16px;
     }
-    textarea {
-      width: 100%;
-      max-width: 600px;
-      height: 200px;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 10px;
-      background: #161b22;
-      color: #eee;
-      resize: vertical;
-      font-size: 14px;
+    .wrap{ width:100%; max-width:820px; }
+    .card{
+      background:var(--card); border:1px solid var(--stroke); border-radius:16px;
+      padding:24px; box-shadow:0 6px 24px rgba(0,0,0,.25);
     }
-    button {
-      margin-top: 20px;
-      background: linear-gradient(90deg,#ff7b00,#ff9100);
-      color: #fff;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s;
+    h1{ margin:0 0 6px; font-size:20px; display:flex; gap:10px; align-items:center }
+    h1 .ico{ font-size:22px }
+    p.legend{ margin:0 0 16px; color:var(--muted) }
+
+    textarea{
+      width:100%; min-height:220px; resize:vertical; border-radius:12px;
+      border:1px solid var(--stroke); background:#0f141a; color:var(--txt);
+      padding:14px; line-height:1.5; font-size:14px; outline:none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0);
     }
-    button:hover {
-      opacity: 0.9;
+    textarea:focus{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.06) }
+
+    .row{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap }
+    button{
+      appearance:none; border:0; cursor:pointer; border-radius:12px;
+      padding:12px 18px; font-weight:700; color:#fff;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      transition:.2s transform, .2s opacity;
     }
-    #result {
-      margin-top: 30px;
-      font-size: 14px;
-      text-align: left;
-      max-width: 600px;
-      line-height: 1.6;
+    button:hover{ transform:translateY(-1px); opacity:.95 }
+    .ghost{ background:#222b36; color:var(--txt); font-weight:600 }
+    .ghost:hover{ opacity:.9 }
+
+    .result{ margin-top:18px; font-size:14px; line-height:1.6 }
+    .ok{ color:var(--ok) } .err{ color:var(--err) }
+
+    .pre{
+      background:#0f141a; border:1px dashed var(--stroke); border-radius:10px;
+      padding:12px; overflow:auto; max-height:220px;
     }
-    .success { color: #4caf50; }
-    .error { color: #ff5252; }
+    .foot{ margin-top:18px; color:var(--muted); font-size:12px }
+    a{ color:#79c0ff; text-decoration:none }
+    a:hover{ text-decoration:underline }
   </style>
 </head>
 <body>
-  <h1>🛒 Admin Keranjang — Tambah dari Link Shopee</h1>
-  <p>Tempel link produk Shopee (satu per baris) di bawah ini:</p>
-  <textarea id="links" placeholder="https://shopee.co.id/...\nhttps://shopee.co.id/...\n"></textarea>
-  <button onclick="kirim()">Tambah ke Sheet (auto judul & gambar)</button>
-  <div id="result"></div>
+  <div class="wrap">
+    <div class="card">
+      <h1><span class="ico">🛒</span>Admin Keranjang — Tambah dari Link Shopee</h1>
+      <p class="legend">Tempel link produk (satu per baris). Contoh: <code>https://s.shopee.co.id/XXXX</code></p>
+
+      <textarea id="links" placeholder="https://s.shopee.co.id/1qT9kK7G7v
+https://s.shopee.co.id/abc123
+https://shopee.co.id/...."></textarea>
+
+      <div class="row">
+        <button id="btnSend">Tambah ke Sheet (auto judul &amp; gambar)</button>
+        <button class="ghost" id="btnClear">Bersihkan</button>
+      </div>
+
+      <div id="result" class="result"></div>
+      <div id="preview" class="pre" hidden></div>
+
+      <div class="foot">Butuh bantuan? Pastikan Web App Apps Script sudah <em>Anyone</em> &amp; masukkan URL <code>/exec</code> yang benar.</div>
+    </div>
+  </div>
 
   <script>
-    async function kirim() {
-      const links = document.getElementById('links').value.trim();
-      if (!links) {
-        alert('Masukkan minimal satu link Shopee!');
-        return;
-      }
-      const resBox = document.getElementById('result');
-      resBox.innerHTML = '⏳ Mengirim...';
+    // === GANTI dengan URL Web App kamu (akhiran /exec) ===
+    const WEBAPP = 'https://script.google.com/macros/s/AKfycby5QrzRdzxQ5uyVf108tGl3byD6Nh71pEc5nywRVb2JHZODByhhU5XyCuBcKnZ_ZZSP/exec';
+
+    const $ = sel => document.querySelector(sel);
+    const $links = $('#links');
+    const $res = $('#result');
+    const $prev = $('#preview');
+
+    $('#btnClear').onclick = () => {
+      $links.value = '';
+      $res.textContent = '';
+      $prev.hidden = true; $prev.textContent='';
+    };
+
+    $('#btnSend').onclick = async () => {
+      const lines = $links.value.trim().split(/\n+/).map(s=>s.trim()).filter(Boolean);
+      if (!lines.length) { alert('Masukkan minimal satu link.'); return; }
+
+      $res.innerHTML = '⏳ Mengirim...'; $prev.hidden = true; $prev.textContent='';
 
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ links: links.split('\n') })
-        });
-        const data = await response.json();
-        if (data.success) {
-          resBox.innerHTML = `<p class='success'>✅ Berhasil menambah ${data.count} produk ke Google Sheet!</p>`;
+        const fd = new FormData();
+        fd.append('links', lines.join('\n')); // FormData -> tanpa preflight CORS
+
+        const resp = await fetch(WEBAPP, { method:'POST', body:fd });
+        const data = await resp.json();
+
+        if (data && data.ok) {
+          const list = (data.added||[]).map(p => `#${p.no} — ${p.title}`).join('\n');
+          $res.innerHTML = `<span class="ok">✅ Berhasil menambah ${ (data.added||[]).length } produk.</span>`;
+          $prev.hidden = false; $prev.textContent = list || '(tidak ada preview)';
         } else {
-          resBox.innerHTML = `<p class='error'>❌ Gagal: ${data.error}</p>`;
+          $res.innerHTML = `<span class="err">❌ Gagal: ${ (data && data.error) || 'unknown error' }</span>`;
         }
       } catch (err) {
-        resBox.innerHTML = `<p class='error'>⚠️ Error koneksi: ${err.message}</p>`;
+        $res.innerHTML = `<span class="err">⚠️ Error koneksi: ${err.message}</span>`;
       }
-    }
+    };
   </script>
 </body>
 </html>
