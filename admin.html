@@ -1,95 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin Keranjang — Tambah dari Link Shopee</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛒 Admin Keranjang — Tambah dari Link Shopee</title>
   <style>
-    :root{--bg:#0b1220;--card:#0f172a;--line:#1f2937;--txt:#e5e7eb;--muted:#9ca3af;--accent:#ff7a3d;--accent2:#d45c21}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--txt)}
-    .wrap{max-width:900px;margin:0 auto;padding:20px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
-    h1{margin:8px 0 16px}
-    textarea{width:100%;min-height:220px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--txt);padding:12px}
-    input,button{padding:10px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--txt)}
-    button.primary{background:var(--accent);border-color:var(--accent2);color:#000;font-weight:800;cursor:pointer}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .mono{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;border:1px solid var(--line);background:#0b1220;border-radius:12px;padding:12px}
-    .ok{color:#22c55e}
-    .err{color:#f43f5e}
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f5f7fb;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #ff7b00;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-size: 14px;
+    }
+    button {
+      background: linear-gradient(45deg, #ff7b00, #ff9900);
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    #result {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    img.preview {
+      width: 80px;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Admin Keranjang — Tambah dari Link Shopee</h1>
+  <h1>🛒 Admin Keranjang — Tambah dari Link Shopee</h1>
+  <p>Tempelkan 1 atau lebih link Shopee di bawah, lalu klik <b>Tambah ke Sheet</b> untuk otomatis mengambil nama produk, gambar, dan nomor urut.</p>
 
-    <div class="card">
-      <p><b>1) Tempel caption / daftar link</b> (bisa campur teks). Tool ini akan ambil <i>og:title</i> & <i>og:image</i> otomatis via Apps Script kamu.</p>
-      <textarea id="paste" placeholder="Contoh:\nYuk spill 👇\nAtasan: https://s.shopee.co.id/AAA\nRok: https://s.shopee.co.id/BBB\nTas: https://s.shopee.co.id/CCC"></textarea>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <button id="btnPreview">Preview Link</button>
-        <button id="btnSubmit" class="primary">Tambah ke Sheet (auto judul & gambar)</button>
-      </div>
-      <div id="stat" class="mono" style="margin-top:10px">Siap…</div>
-    </div>
+  <textarea id="links" placeholder="https://s.shopee.co.id/xxxxxxx... (bisa banyak baris)"></textarea>
+  <br>
+  <button id="btnSend">Tambah ke Sheet (auto judul & gambar)</button>
 
-    <div class="card">
-      <p><b>2) Hasil terakhir</b> (dari Apps Script). Kalau sukses, buka halaman utama dan refresh.</p>
-      <div id="out" class="mono"></div>
-    </div>
-
-    <div class="card">
-      <p><b>Tips:</b> Tab Sheet harus bernama <code>data</code>. Kolom: <code>no | name | link | image | price | tags | created_at</code>. Nomor akan meneruskan baris terakhir otomatis.</p>
-    </div>
-  </main>
+  <div id="result"></div>
 
   <script>
-    // Ganti dengan Web App URL kamu (sudah diisi sesuai yang kamu kirim)
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec";
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec';
 
-    const $ = (s, r=document) => r.querySelector(s);
-    const stat = $('#stat');
-    const out  = $('#out');
+    document.getElementById('btnSend').addEventListener('click', async () => {
+      const input = document.getElementById('links').value.trim();
+      const result = document.getElementById('result');
+      result.innerHTML = '<p>⏳ Memproses link...</p>';
 
-    function extractLinks(text){
-      // Ambil semua URL http/https
-      const m = text.match(/https?:\/\/\S+/g) || [];
-      // Bersihkan trailing tanda baca
-      return m.map(x => x.replace(/[),.;]$/,'')).filter(Boolean);
-    }
+      if (!input) {
+        alert('Tempel dulu link Shopee-nya, bro!');
+        return;
+      }
 
-    $('#btnPreview').addEventListener('click', ()=>{
-      const links = extractLinks($('#paste').value || '');
-      if(!links.length){ stat.innerHTML = '<span class="err">Tidak ada link ditemukan.</span>'; return; }
-      stat.textContent = `${links.length} link terdeteksi:`;
-      out.textContent = links.map((l,i)=>`${String(i+1).padStart(2,'0')}. ${l}`).join('\n');
-    });
+      const links = input.split(/\n|,/).map(x => x.trim()).filter(x => x);
 
-    $('#btnSubmit').addEventListener('click', async ()=>{
-      const links = extractLinks($('#paste').value || '');
-      if(!links.length){ stat.innerHTML = '<span class="err">Tempel minimal 1 link Shopee.</span>'; return; }
-      stat.textContent = 'Mengirim ke Apps Script…';
-      out.textContent = '';
-      try{
-        const ctl = new AbortController();
-        const t = setTimeout(()=>ctl.abort(), 25000); // timeout 25s
-        const res = await fetch(WEBAPP_URL, {
+      try {
+        const res = await fetch(API_URL, {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ links }),
-          signal: ctl.signal
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ links })
         });
-        clearTimeout(t);
-        const data = await res.json().catch(()=>({ok:false,error:'Invalid JSON'}));
-        if(data.ok){
-          stat.innerHTML = `<span class="ok">Berhasil tambah ${data.added.length} item.</span> Buka halaman utama & refresh.`;
-          out.textContent = data.added.map(it=>`#${String(it.no).padStart(2,'0')} — ${it.title}\n${it.link}\n${it.image}\n`).join('\n');
-        }else{
-          stat.innerHTML = `<span class="err">Gagal:</span> ${data.error || 'unknown'}`;
+
+        const data = await res.json();
+        if (data.ok) {
+          let html = `<h3>✅ Berhasil menambah ${data.added.length} produk</h3>`;
+          html += data.added.map(p => `
+            <div style='display:flex;align-items:center;margin-bottom:10px;'>
+              <img src='${p.image}' class='preview'>
+              <div><b>${p.title}</b><br><a href='${p.link}' target='_blank'>${p.link}</a></div>
+            </div>`).join('');
+          result.innerHTML = html;
+        } else {
+          result.innerHTML = `<p style='color:red;'>❌ Gagal: ${data.error}</p>`;
         }
-      }catch(err){
-        stat.innerHTML = `<span class=\"err\">Network error:</span> ${String(err)}`;
+      } catch (err) {
+        result.innerHTML = `<p style='color:red;'>🚨 Error: ${err.message}</p>`;
       }
     });
   </script>
