@@ -1,170 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Keranjang — Rekomendasi Outfit</title>
-  <meta name="description" content="Daftar produk bernomor ala keranjang kuning. Cari berdasarkan nomor atau kata kunci." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekomendasi Outfit - Keranjang Pages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg:#ffffff;
-      --text:#111827; /* gray-900 */
-      --muted:#6b7280; /* gray-500 */
-      --line:#e5e7eb;  /* gray-200 */
-      --card:#ffffff;
-      --shadow:0 8px 28px rgba(17,24,39,.10);
-      --accent:#ff7a3d;          /* oranye */
-      --accent-2:#ff9f50;        /* oranye muda */
-      --accent-dark:#d45c21;     /* hover */
-      --chip:#f3f4f6;            /* abu chip */
-      --ring:#fde68a;            /* amber-200 */
-      --wa:#22c55e;              /* green */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b1622;
+      margin: 0;
+      color: #fff;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
-    a{color:inherit}
-
-    /* Header kartu oranye seperti collshp */
-    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.86);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
-    .wrap{max-width:960px;margin:0 auto;padding:16px}
-    .hero{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0b1220;border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
-    .hero .emoji{font-size:22px}
-    .hero h1{margin:0;font-size:18px;line-height:1.1}
-    .hero p{margin:2px 0 0;font-size:13px;opacity:.9}
-
-    /* Search bar bulat */
-    .search{display:flex;align-items:center;gap:8px;margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 14px;box-shadow:0 2px 8px rgba(17,24,39,.05)}
-    .search input{border:0;outline:0;width:100%;font-size:15px}
-
-    /* Grid kartu */
-    main{padding:10px 16px 64px;max-width:960px;margin:0 auto}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    @media(min-width:760px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-    @media(min-width:1024px){.grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
-
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-    .img{position:relative;aspect-ratio:1/1;background:#f8fafc;display:grid;place-items:center}
-    .img img{width:100%;height:100%;object-fit:cover}
-    .badge{position:absolute;top:10px;left:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px 8px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.06)}
-    .body{padding:10px 12px}
-    .ttl{margin:0 0 6px;font-size:14px;line-height:1.25;height:36px;overflow:hidden}
-    .muted{color:var(--muted);font-size:11px}
-    .price{font-weight:800}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-    .tag{background:var(--chip);border:1px dashed var(--line);border-radius:999px;padding:4px 8px;font-size:10.5px;color:#4b5563}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 10px;border-radius:12px;text-decoration:none;text-align:center;border:1px solid #111827;background:#fff;color:#111827;font-weight:700}
-    .btn.primary{background:var(--accent);border-color:var(--accent-dark);color:#111}
-    .btn.primary:hover{filter:saturate(1.1)}
-    .btn.ghost{border-color:var(--line)}
-
-    /* Floating WhatsApp */
-    .float-wa{position:fixed;right:16px;bottom:16px;background:var(--wa);color:#fff;border-radius:999px;box-shadow:0 14px 30px rgba(34,197,94,.35);display:flex;align-items:center;gap:10px;padding:12px 14px;font-weight:900;text-decoration:none}
-
-    footer{display:flex;justify-content:center;color:var(--muted);font-size:12px;padding:20px}
+    .header {
+      background: linear-gradient(90deg, #ff914d, #ff6b00);
+      padding: 18px;
+      border-radius: 0 0 16px 16px;
+      text-align: center;
+    }
+    .header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    .header p { margin: 6px 0 0; font-size: 13px; color: #fff; opacity: 0.8; }
+    .container { max-width: 420px; margin: 20px auto; padding: 10px; }
+    .search-box { display: flex; align-items: center; background: #fff; border-radius: 24px; padding: 6px 12px; }
+    .search-box input {
+      border: none; outline: none; flex: 1; font-size: 14px;
+      padding: 6px 10px; border-radius: 24px;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .card {
+      background: #fff; color: #000; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      display: flex; flex-direction: column;
+    }
+    .card img { width: 100%; height: 140px; object-fit: cover; }
+    .card-body { padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card h3 { font-size: 13px; margin: 0 0 6px; line-height: 1.3; height: 32px; overflow: hidden; }
+    .card .price { font-size: 13px; color: #ff6b00; margin-bottom: 6px; }
+    .btns { display: flex; justify-content: space-between; }
+    .btn {
+      flex: 1; margin: 2px; text-align: center; font-weight: 600;
+      border-radius: 6px; padding: 6px 0; text-decoration: none; color: #fff;
+    }
+    .btn-orange { background: #ff6b00; }
+    .btn-gray { background: #444; }
+    .wa-btn {
+      position: fixed; bottom: 20px; right: 20px; background: #25D366;
+      color: #fff; border-radius: 50px; padding: 12px 20px; font-weight: 600;
+      text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="hero">
-        <div class="emoji">👗</div>
-        <div>
-          <h1>Rekomendasi Outfit</h1>
-          <p>Inspirasi outfit kamu. Cari berdasar nomor: "856", "364" atau kata kunci.</p>
-        </div>
-      </div>
-      <label class="search" title="Cari judul, tag, atau nomor">
-        <span>🔎</span>
-        <input id="q" type="search" placeholder="Cari produk… (judul/#tag/nomor)">
-      </label>
+  <div class="header">
+    <h1>👗 Rekomendasi Outfit</h1>
+    <p>Inspirasi Outfit Kamu</p>
+  </div>
+
+  <div class="container">
+    <div class="search-box">
+      <input id="search" placeholder="Cari produk..." oninput="render()" />
     </div>
-  </header>
+    <div id="list" class="grid"></div>
+  </div>
 
-  <main>
-    <div id="grid" class="grid"></div>
-    <footer>© <span id="year"></span> Keranjang — dibuat tanpa backend</footer>
-  </main>
-
-  <!-- Tombol WA global -->
-  <a class="float-wa" id="waBtn" href="#" target="_blank" rel="noopener">Chat WA</a>
-
-  <template id="card-tpl">
-    <article class="card">
-      <div class="img"><span>no image</span></div>
-      <span class="badge">#00</span>
-      <div class="body">
-        <h3 class="ttl">Judul Produk</h3>
-        <div class="muted price">Rp0</div>
-        <div class="tags"></div>
-        <div class="actions">
-          <a class="btn primary" target="_blank" rel="noopener">Keranjang</a>
-          <button class="btn ghost copy">Salin Link</button>
-        </div>
-      </div>
-    </article>
-  </template>
+  <a href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s" class="wa-btn" target="_blank">Channel WA</a>
 
   <script>
-    // ===== KONFIG CEPAT =====
-    const WA_LINK = "https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s"; // link Channel WA kamu
-
-    const grid = document.getElementById('grid');
-    const q = document.getElementById('q');
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('waBtn').href = WA_LINK;
-    document.getElementById('waBtn').textContent = 'Channel WA';
-
-    const params = new URLSearchParams(location.search);
-    if(params.get('q')) q.value = params.get('q');
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
+    let products = [];
 
     async function load(){
-      const res = await fetch('products.json?'+Date.now());
-      const data = await res.json();
-      return Array.isArray(data)?data:(data.items||[]);
+      const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+      const csv = await res.text();
+      const rows = csv.trim().split(/\r?\n/).map(r => r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
+      const [hdr, ...data] = rows;
+      const idx = Object.fromEntries(hdr.map((h,i)=>[h.trim().toLowerCase(), i]));
+      products = data.map(r => ({
+        no: (r[idx.no]||'').trim(),
+        name: (r[idx.name]||'').replace(/^"|"$/g,''),
+        link: (r[idx.link]||'').replace(/^"|"$/g,''),
+        image: (r[idx.image]||'').replace(/^"|"$/g,''),
+        price: (r[idx.price]||'').replace(/^"|"$/g,''),
+        tags: (r[idx.tags]||'').replace(/^"|"$/g,'').split(/\s+/).filter(Boolean)
+      })).filter(x => x.link);
+      render();
     }
 
-    function match(p,kw){
-      kw = kw.toLowerCase(); if(!kw) return true;
-      return (
-        (p.name||'').toLowerCase().includes(kw) ||
-        (p.tags||[]).some(t=>t.toLowerCase().includes(kw)) ||
-        String(p.no||'')===kw ||
-        String(p.no||'').padStart(3,'0')===kw
-      );
-    }
-
-    function card(node,p){
-      node.querySelector('.badge').textContent = `#${String(p.no).padStart(2,'0')}`;
-      node.querySelector('.ttl').textContent = p.name||'Tanpa judul';
-      node.querySelector('.price').textContent = p.price||'';
-      node.querySelector('.btn.primary').href = p.link;
-      node.querySelector('.copy').addEventListener('click',async(e)=>{
-        try{await navigator.clipboard.writeText(p.link); e.target.textContent='Tersalin ✓'; setTimeout(()=>e.target.textContent='Salin Link',1200);}catch(err){alert('Gagal menyalin');}
+    function render(){
+      const q = document.getElementById('search').value.toLowerCase();
+      const wrap = document.getElementById('list');
+      wrap.innerHTML = '';
+      products.filter(p =>
+        !q || p.name.toLowerCase().includes(q) || p.no.includes(q)
+      ).forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${p.image || 'https://via.placeholder.com/300x300?text=No+Image'}" alt="${p.name}">
+          <div class="card-body">
+            <div>
+              <h3>${p.no ? '#' + p.no + ' ' : ''}${p.name}</h3>
+              ${p.price ? `<div class='price'>${p.price}</div>` : ''}
+            </div>
+            <div class="btns">
+              <a href="${p.link}" target="_blank" class="btn btn-orange">Keranjang</a>
+              <a href="${p.link}" target="_blank" class="btn btn-gray">Salin Link</a>
+            </div>
+          </div>`;
+        wrap.appendChild(card);
       });
-      const t = (p.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('');
-      node.querySelector('.tags').innerHTML = t;
-      const box = node.querySelector('.img');
-      if(p.image){const im=new Image(); im.loading='lazy'; im.src=p.image; im.alt=p.name||''; box.innerHTML=''; box.appendChild(im);}    
     }
 
-    function render(list){
-      const tpl = document.getElementById('card-tpl');
-      grid.innerHTML='';
-      list.forEach(p=>{const n=tpl.content.cloneNode(true); card(n,p); grid.appendChild(n)});
-    }
-
-    let DATA=[];
-    load().then(arr=>{DATA=arr.sort((a,b)=> (a.no||0)-(b.no||0)); filter();});
-
-    function filter(){
-      const kw = q.value.trim();
-      const out = DATA.filter(p=>match(p,kw));
-      render(out);
-      const ps = new URLSearchParams(location.search); ps.set('q',kw); history.replaceState({},'',`?${ps.toString()}`);
-    }
-    q.addEventListener('input', filter);
+    load();
   </script>
 </body>
 </html>
