@@ -1,136 +1,205 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rekomendasi Outfit</title>
+
+  <!-- performa kecil-kecilan -->
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="preconnect" href="https://down-id.img.susercontent.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
   <style>
     :root{
-      --bg:#0d1117; --card:#161b22; --txt:#e6edf3; --muted:#9da7b3;
-      --stroke:#243041; --brand1:#ff7b00; --brand2:#ff9100;
+      --bg:#0b1622; --card:#ffffff; --text:#0b0f19;
+      --brand:#ff6b00; --brand2:#ff914d; --muted:#8aa0b7;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);
-         font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-    header{padding:16px;background:linear-gradient(90deg,var(--brand1),var(--brand2));
-           color:#fff;font-weight:700;text-align:center}
-    .wrap{max-width:960px;margin:16px auto;padding:0 12px}
-    .search{width:100%;background:#0f141a;border:1px solid var(--stroke);
-            color:var(--txt);border-radius:999px;padding:12px 16px;margin:10px 0}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    @media(min-width:720px){.grid{grid-template-columns:repeat(4,1fr)}}
-    .card{background:var(--card);border:1px solid var(--stroke);border-radius:14px;
-          overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.2);transition:.18s transform}
-    .card:hover{transform:translateY(-2px)}
-    .thumb{width:100%;aspect-ratio:1/1;object-fit:cover;background:#0f141a}
-    .body{padding:10px}
-    .title{display:block;color:var(--txt);text-decoration:none;
-           font-size:14px;font-weight:700;line-height:1.3;margin-bottom:6px}
-    .meta{font-size:12px;color:var(--muted)}
-    .chip{display:inline-block;background:#223045;border:1px solid var(--stroke);
-          color:#b9c4d0;padding:2px 8px;border-radius:999px;margin-right:6px;font-size:11px}
-    .empty{color:var(--muted);text-align:center;padding:40px}
-    footer{position:fixed;right:16px;bottom:16px;background:#1f6feb;color:#fff;
-           padding:10px 14px;border-radius:999px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg); color:#fff;
+    }
+    .wrap{max-width:480px;margin:0 auto;padding:0 14px 80px}
+    .header{
+      position:sticky; top:0; z-index:3;
+      background:linear-gradient(90deg,var(--brand2),var(--brand));
+      padding:18px 16px 20px; border-radius:0 0 18px 18px; box-shadow:0 6px 14px rgba(0,0,0,.18);
+      text-align:center;
+    }
+    .header h1{margin:0; font-size:20px; font-weight:800}
+    .header p{margin:6px 0 0; font-size:13px; opacity:.9}
+
+    .search{
+      margin:16px 0 10px; background:#fff; border-radius:26px; padding:8px 12px;
+      display:flex; align-items:center; gap:8px; box-shadow:0 2px 10px rgba(0,0,0,.15);
+    }
+    .search input{
+      border:none; outline:none; width:100%; font-size:14px; color:#0f172a;
+    }
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{
+      background:var(--card); color:var(--text);
+      border-radius:14px; overflow:hidden; display:flex; flex-direction:column;
+      box-shadow:0 4px 14px rgba(0,0,0,.25); cursor:pointer; transition:transform .12s ease;
+    }
+    .card:active{transform:scale(.98)}
+    .thumb{width:100%; aspect-ratio:1/1; background:#e9eef5; display:block; overflow:hidden}
+    .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+    .body{padding:10px 10px 12px; display:flex; flex-direction:column; gap:6px}
+    .name{font-size:13px; font-weight:600; line-height:1.3; height:34px; overflow:hidden}
+    .price{font-size:13px; color:var(--brand)}
+
+    .empty{color:var(--muted); text-align:center; margin:36px 0}
+    .cta-wa{
+      position:fixed; right:16px; bottom:18px; z-index:4;
+      background:#25D366; color:#fff; text-decoration:none; border:none;
+      padding:12px 16px; border-radius:999px; font-weight:700; box-shadow:0 8px 20px rgba(0,0,0,.28);
+    }
   </style>
 </head>
 <body>
-  <header>🧡 Rekomendasi Outfit</header>
-  <div class="wrap">
-    <input id="q" class="search" placeholder="Cari produk / tag…"/>
-    <div id="list" class="grid"></div>
-    <div id="empty" class="empty" hidden>Gagal memuat data.</div>
+  <div class="header">
+    <h1>🧺 Rekomendasi Outfit</h1>
+    <p>Inspirasi Outfit Kamu</p>
   </div>
-  <a href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s" target="_blank" rel="noopener" style="text-decoration:none;">
-    <footer>Channel WA</footer>
-  </a>
+
+  <div class="wrap">
+    <div class="search">
+      <input id="q" placeholder="Cari produk / tag / #nomor..." />
+    </div>
+
+    <div id="list" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">Gagal memuat data.</div>
+  </div>
+
+  <a class="cta-wa" target="_blank" href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s">Channel WA</a>
 
   <script>
-    // ==== GANTI ke URL CSV Sheet kamu ====
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
+    // === 1) Link CSV Google Sheet KAMU (sudah di-embed) ===
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
 
-    const $ = s => document.querySelector(s);
-    const $list = $('#list'), $empty = $('#empty'), $q = $('#q');
+    // === 2) Fallback gambar kalau 403/404 ==
+    const NO_IMAGE = "https://via.placeholder.com/300x300?text=No+Image";
+
     let ALL = [];
 
-    // Baca CSV → array object {no,name,link,image,tags,price}
-    async function loadCSV(url){
-      const res = await fetch(url + '&t=' + Date.now());
-      if(!res.ok) throw new Error(res.status+' '+res.statusText);
-      const text = await res.text();
-      const rows = text.trim().split(/\r?\n/).map(line =>
-        line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/) // split CSV aman untuk kolom ber-quote
-      );
-      const [hdr, ...data] = rows;
-      const idx = Object.fromEntries(hdr.map((h,i)=>[h.trim().toLowerCase(), i]));
-      return data.map(r => {
-        const pick = k => (r[idx[k]]||'').replace(/^"|"$/g,'').trim();
-        return {
-          no: pick('no'),
-          name: pick('name'),
-          link: pick('link'),
-          image: pick('image'),
-          price: pick('price'),
-          tags: pick('tags')
-        };
-      }).filter(x => x.link);
+    // Buka app Shopee dulu, kalau tidak respons 400ms, fallback ke web
+    function openShopee(link) {
+      try {
+        const deep = "shopee://external?url=" + encodeURIComponent(link);
+        const timer = setTimeout(() => window.open(link, "_blank"), 400);
+        // pada banyak browser mobile, assignment ke location akan mencoba buka app
+        window.location.href = deep;
+        // sebagian browser butuh noop untuk tidak error
+        void 0;
+      } catch (e) {
+        // fallback paling aman
+        window.open(link, "_blank");
+      }
     }
 
-    // Deep-link ke app Shopee + fallback web
-    function openShopee(link){
-      const app = 'shopee://open?url=' + encodeURIComponent(link);
-      const t = Date.now();
-      const iframe = document.createElement('iframe');
-      iframe.style.display='none'; iframe.src = app;
-      document.body.appendChild(iframe);
-      setTimeout(()=>{
-        if(Date.now()-t < 1500) window.open(link,'_blank','noopener');
-        setTimeout(()=>iframe.remove(), 1000);
-      },700);
-    }
+    // Render kartu
+    function render(list = ALL) {
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const wrap = document.getElementById("list");
+      const empty = document.getElementById("empty");
+      wrap.innerHTML = "";
 
-    function cardHtml(p){
-      const chips = (p.tags||'').split(',').map(s=>s.trim()).filter(Boolean)
-                     .slice(0,2).map(s=>`<span class="chip">${s}</span>`).join('');
-      return `
-        <article class="card" data-link="${encodeURIComponent(p.link)}" tabindex="0" role="button" aria-label="${p.name}">
-          <img class="thumb" loading="lazy" src="${p.image || 'https://via.placeholder.com/600x600?text=No+Image'}" alt="${p.name}">
-          <div class="body">
-            <span class="title">${p.no ? '#'+p.no+' ' : ''}${p.name || 'Produk'}</span>
-            <div class="meta">${chips}</div>
-          </div>
-        </article>`;
-    }
+      const items = list.filter(p => {
+        if (!q) return true;
+        return (p.name || "").toLowerCase().includes(q) ||
+               (p.tags || "").toLowerCase().includes(q) ||
+               String(p.no || "").includes(q);
+      });
 
-    function render(items){
-      if(!items.length){ $list.innerHTML=''; $empty.hidden=false; return; }
-      $empty.hidden = true;
-      $list.innerHTML = items.map(cardHtml).join('');
-      $list.querySelectorAll('.card').forEach(el=>{
-        const link = decodeURIComponent(el.getAttribute('data-link'));
-        el.addEventListener('click', ()=>openShopee(link));
-        el.addEventListener('keydown', e=>{
-          if(e.key==='Enter'||e.key===' ') openShopee(link);
-        });
+      empty.style.display = items.length ? "none" : "block";
+
+      items.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.onclick = () => openShopee(p.link);
+
+        const img = document.createElement("img");
+        img.src = p.image || NO_IMAGE;
+        img.alt = p.name || "Produk";
+        img.onerror = () => { img.onerror = null; img.src = NO_IMAGE; };
+
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        thumb.appendChild(img);
+
+        const body = document.createElement("div");
+        body.className = "body";
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = (p.no ? `#${p.no} ` : "") + (p.name || "Produk");
+
+        const price = document.createElement("div");
+        price.className = "price";
+        if (p.price) price.textContent = p.price;
+
+        body.appendChild(name);
+        if (p.price) body.appendChild(price);
+
+        card.appendChild(thumb);
+        card.appendChild(body);
+        wrap.appendChild(card);
       });
     }
 
-    function filter(items, q){
-      q = (q||'').toLowerCase();
-      if(!q) return items;
-      return items.filter(p =>
-        String(p.name||'').toLowerCase().includes(q) ||
-        String(p.tags||'').toLowerCase().includes(q) ||
-        String(p.no||'').toLowerCase().includes(q)
-      );
+    // Muat CSV dari Sheet → parse aman (tahan koma di dalam kutip)
+    async function loadData() {
+      try {
+        const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error(res.status + " " + res.statusText);
+        const csv = await res.text();
+
+        const rows = csv
+          .trim()
+          .split(/\r?\n/)
+          .map(line => {
+            const out = [];
+            let cur = "", inQ = false;
+            for (let i = 0; i < line.length; i++) {
+              const ch = line[i];
+              if (ch === '"' ) {
+                if (inQ && line[i+1] === '"') { cur += '"'; i++; }   // escaped quote
+                else inQ = !inQ;
+              } else if (ch === ',' && !inQ) {
+                out.push(cur); cur = "";
+              } else cur += ch;
+            }
+            out.push(cur);
+            return out;
+          });
+
+        const [hdr, ...data] = rows;
+        const idx = Object.fromEntries(hdr.map((h,i)=>[ (h||"").trim().toLowerCase(), i ]));
+
+        ALL = data.map(r => ({
+          no   : (r[idx.no]||"").trim(),
+          name : (r[idx.name]||"").replace(/^"|"$/g,"").trim(),
+          link : (r[idx.link]||"").replace(/^"|"$/g,"").trim(),
+          image: (r[idx.image]||"").replace(/^"|"$/g,"").trim(),
+          price: (r[idx.price]||"").replace(/^"|"$/g,"").trim(),
+          tags : (r[idx.tags]||"").replace(/^"|"$/g,"").trim()
+        }))
+        .filter(x => x.link);
+
+        render();
+      } catch (err) {
+        console.error("Load error:", err);
+        document.getElementById("empty").style.display = "block";
+        document.getElementById("empty").textContent = "Gagal memuat data.";
+      }
     }
 
-    // Load & init
-    loadCSV(SHEET_CSV_URL)
-      .then(data => { ALL = data; render(ALL); })
-      .catch(err => { $empty.hidden=false; $empty.textContent='Gagal memuat data.'; console.error(err); });
-
-    $q.addEventListener('input', ()=>render(filter(ALL, $q.value)));
+    document.getElementById("q").addEventListener("input", () => render());
+    loadData();
   </script>
 </body>
 </html>
