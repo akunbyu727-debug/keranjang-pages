@@ -3,104 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛒 Admin Keranjang — Tambah dari Link Shopee</title>
+  <title>Admin Keranjang — Tambah dari Link Shopee</title>
   <style>
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-      background: #f5f7fb;
-      color: #333;
-      margin: 0;
-      padding: 20px;
+      background: #0d1117;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
     }
     h1 {
-      color: #ff7b00;
-      text-align: center;
+      color: #ffa24a;
+      margin-bottom: 10px;
     }
     textarea {
       width: 100%;
-      height: 180px;
-      padding: 12px;
+      max-width: 600px;
+      height: 200px;
+      border: 1px solid #333;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      background: #161b22;
+      color: #eee;
       resize: vertical;
       font-size: 14px;
     }
     button {
-      background: linear-gradient(45deg, #ff7b00, #ff9900);
+      margin-top: 20px;
+      background: linear-gradient(90deg,#ff7b00,#ff9100);
+      color: #fff;
       border: none;
-      padding: 12px 18px;
+      padding: 12px 25px;
       border-radius: 8px;
-      color: white;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-      margin-top: 10px;
+      font-weight: bold;
+      transition: all 0.2s;
     }
     button:hover {
       opacity: 0.9;
     }
     #result {
-      background: #fff;
-      border-radius: 10px;
-      padding: 15px;
-      margin-top: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      font-size: 14px;
+      text-align: left;
+      max-width: 600px;
+      line-height: 1.6;
     }
-    img.preview {
-      width: 80px;
-      border-radius: 8px;
-      margin-right: 10px;
-    }
+    .success { color: #4caf50; }
+    .error { color: #ff5252; }
   </style>
 </head>
 <body>
   <h1>🛒 Admin Keranjang — Tambah dari Link Shopee</h1>
-  <p>Tempelkan 1 atau lebih link Shopee di bawah, lalu klik <b>Tambah ke Sheet</b> untuk otomatis mengambil nama produk, gambar, dan nomor urut.</p>
-
-  <textarea id="links" placeholder="https://s.shopee.co.id/xxxxxxx... (bisa banyak baris)"></textarea>
-  <br>
-  <button id="btnSend">Tambah ke Sheet (auto judul & gambar)</button>
-
+  <p>Tempel link produk Shopee (satu per baris) di bawah ini:</p>
+  <textarea id="links" placeholder="https://shopee.co.id/...\nhttps://shopee.co.id/...\n"></textarea>
+  <button onclick="kirim()">Tambah ke Sheet (auto judul & gambar)</button>
   <div id="result"></div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec';
-
-    document.getElementById('btnSend').addEventListener('click', async () => {
-      const input = document.getElementById('links').value.trim();
-      const result = document.getElementById('result');
-      result.innerHTML = '<p>⏳ Memproses link...</p>';
-
-      if (!input) {
-        alert('Tempel dulu link Shopee-nya, bro!');
+    async function kirim() {
+      const links = document.getElementById('links').value.trim();
+      if (!links) {
+        alert('Masukkan minimal satu link Shopee!');
         return;
       }
-
-      const links = input.split(/\n|,/).map(x => x.trim()).filter(x => x);
+      const resBox = document.getElementById('result');
+      resBox.innerHTML = '⏳ Mengirim...';
 
       try {
-        const res = await fetch(API_URL, {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ links })
+          body: JSON.stringify({ links: links.split('\n') })
         });
-
-        const data = await res.json();
-        if (data.ok) {
-          let html = `<h3>✅ Berhasil menambah ${data.added.length} produk</h3>`;
-          html += data.added.map(p => `
-            <div style='display:flex;align-items:center;margin-bottom:10px;'>
-              <img src='${p.image}' class='preview'>
-              <div><b>${p.title}</b><br><a href='${p.link}' target='_blank'>${p.link}</a></div>
-            </div>`).join('');
-          result.innerHTML = html;
+        const data = await response.json();
+        if (data.success) {
+          resBox.innerHTML = `<p class='success'>✅ Berhasil menambah ${data.count} produk ke Google Sheet!</p>`;
         } else {
-          result.innerHTML = `<p style='color:red;'>❌ Gagal: ${data.error}</p>`;
+          resBox.innerHTML = `<p class='error'>❌ Gagal: ${data.error}</p>`;
         }
       } catch (err) {
-        result.innerHTML = `<p style='color:red;'>🚨 Error: ${err.message}</p>`;
+        resBox.innerHTML = `<p class='error'>⚠️ Error koneksi: ${err.message}</p>`;
       }
-    });
+    }
   </script>
 </body>
 </html>
