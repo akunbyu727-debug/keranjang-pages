@@ -3,105 +3,94 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin JSON Keranjang</title>
+  <title>Admin Keranjang — Tambah dari Link Shopee</title>
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0;background:#0b1220;color:#e5e7eb}
+    :root{--bg:#0b1220;--card:#0f172a;--line:#1f2937;--txt:#e5e7eb;--muted:#9ca3af;--accent:#ff7a3d;--accent2:#d45c21}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--txt)}
     .wrap{max-width:900px;margin:0 auto;padding:20px}
-    .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:16px;margin-bottom:14px}
-    textarea{width:100%;min-height:200px;border-radius:12px;border:1px solid #374151;background:#0b1220;color:#e5e7eb;padding:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+    h1{margin:8px 0 16px}
+    textarea{width:100%;min-height:220px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--txt);padding:12px}
+    input,button{padding:10px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--txt)}
+    button.primary{background:var(--accent);border-color:var(--accent2);color:#000;font-weight:800;cursor:pointer}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    input,button{padding:10px;border-radius:12px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
-    button.primary{background:#ff7a3d;border-color:#d45c21;color:#000;font-weight:800}
-    .list{font-family:ui-monospace,Consolas,monospace;font-size:13px;white-space:pre-wrap;background:#0b1220;border:1px solid #374151;border-radius:12px;padding:12px}
+    .mono{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;border:1px solid var(--line);background:#0b1220;border-radius:12px;padding:12px}
+    .ok{color:#22c55e}
+    .err{color:#f43f5e}
   </style>
 </head>
 <body>
   <main class="wrap">
-    <h1>Admin JSON Keranjang</h1>
-    <div class="card">
-      <p><b>1) Muat JSON lama</b> (opsional, pilih <code>products.json</code> dari repo untuk ditambah):</p>
-      <input type="file" id="pickOld" accept="application/json" />
-      <div id="oldCount" class="muted"></div>
-    </div>
+    <h1>Admin Keranjang — Tambah dari Link Shopee</h1>
 
     <div class="card">
-      <p><b>2) Paste teks Shopee/TikTok caption</b> (alat ini otomatis ekstrak semua link dan memberi nomor berurutan):</p>
-      <textarea id="paste" placeholder="Contoh:\nYuk kita spill 👇\n👔 Atasan: https://s.shopee.co.id/AAAA\n👖 Celana: https://s.shopee.co.id/BBBB\n👜 Tas: https://s.shopee.co.id/CCCC"></textarea>
-      <div class="row">
-        <input id="startNo" type="number" value="1" min="1" />
-        <input id="defaultImg" placeholder="URL gambar default (opsional)" />
+      <p><b>1) Tempel caption / daftar link</b> (bisa campur teks). Tool ini akan ambil <i>og:title</i> & <i>og:image</i> otomatis via Apps Script kamu.</p>
+      <textarea id="paste" placeholder="Contoh:\nYuk spill 👇\nAtasan: https://s.shopee.co.id/AAA\nRok: https://s.shopee.co.id/BBB\nTas: https://s.shopee.co.id/CCC"></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btnPreview">Preview Link</button>
+        <button id="btnSubmit" class="primary">Tambah ke Sheet (auto judul & gambar)</button>
       </div>
-      <button id="preview" class="primary">Preview</button>
+      <div id="stat" class="mono" style="margin-top:10px">Siap…</div>
     </div>
 
     <div class="card">
-      <p><b>3) Hasil</b> (gabungan lama+baru). Klik <i>Download</i> untuk menyimpan <code>products.json</code> lalu commit ke GitHub.</p>
-      <div id="result" class="list"></div>
-      <button id="download" class="primary">Download products.json</button>
+      <p><b>2) Hasil terakhir</b> (dari Apps Script). Kalau sukses, buka halaman utama dan refresh.</p>
+      <div id="out" class="mono"></div>
+    </div>
+
+    <div class="card">
+      <p><b>Tips:</b> Tab Sheet harus bernama <code>data</code>. Kolom: <code>no | name | link | image | price | tags | created_at</code>. Nomor akan meneruskan baris terakhir otomatis.</p>
     </div>
   </main>
 
   <script>
-    const pickOld = document.getElementById('pickOld');
-    const paste = document.getElementById('paste');
-    const result = document.getElementById('result');
-    const startNo = document.getElementById('startNo');
-    const defaultImg = document.getElementById('defaultImg');
-    let OLD=[];
+    // Ganti dengan Web App URL kamu (sudah diisi sesuai yang kamu kirim)
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec";
 
-    pickOld.addEventListener('change', async (e)=>{
-      const f = e.target.files?.[0]; if(!f) return;
-      const txt = await f.text();
-      try{ OLD = JSON.parse(txt); if(!Array.isArray(OLD)) OLD = OLD.items||[]; }catch{ OLD=[] }
-      document.getElementById('oldCount').textContent = `Memuat ${OLD.length} item lama.`;
+    const $ = (s, r=document) => r.querySelector(s);
+    const stat = $('#stat');
+    const out  = $('#out');
+
+    function extractLinks(text){
+      // Ambil semua URL http/https
+      const m = text.match(/https?:\/\/\S+/g) || [];
+      // Bersihkan trailing tanda baca
+      return m.map(x => x.replace(/[),.;]$/,'')).filter(Boolean);
+    }
+
+    $('#btnPreview').addEventListener('click', ()=>{
+      const links = extractLinks($('#paste').value || '');
+      if(!links.length){ stat.innerHTML = '<span class="err">Tidak ada link ditemukan.</span>'; return; }
+      stat.textContent = `${links.length} link terdeteksi:`;
+      out.textContent = links.map((l,i)=>`${String(i+1).padStart(2,'0')}. ${l}`).join('\n');
     });
 
-    function extractPairs(text){
-      const urlRe = /(https?:\/\/[\w.-]+\.[\w.-]+\/[\w\-\/?#=&%+.,]+)/gi;
-      const lines = text.split(/\n+/);
-      const items=[];
-      let lastLabel='';
-      for(const line of lines){
-        const links = [...line.matchAll(urlRe)].map(m=>m[1]);
-        const label = line.replace(urlRe,'').trim();
-        if(label) lastLabel = label.replace(/^[\-•*🛒📎✦◇▶️\s]+/,'');
-        for(const link of links){
-          items.push({name:lastLabel||'Item',link});
+    $('#btnSubmit').addEventListener('click', async ()=>{
+      const links = extractLinks($('#paste').value || '');
+      if(!links.length){ stat.innerHTML = '<span class="err">Tempel minimal 1 link Shopee.</span>'; return; }
+      stat.textContent = 'Mengirim ke Apps Script…';
+      out.textContent = '';
+      try{
+        const ctl = new AbortController();
+        const t = setTimeout(()=>ctl.abort(), 25000); // timeout 25s
+        const res = await fetch(WEBAPP_URL, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ links }),
+          signal: ctl.signal
+        });
+        clearTimeout(t);
+        const data = await res.json().catch(()=>({ok:false,error:'Invalid JSON'}));
+        if(data.ok){
+          stat.innerHTML = `<span class="ok">Berhasil tambah ${data.added.length} item.</span> Buka halaman utama & refresh.`;
+          out.textContent = data.added.map(it=>`#${String(it.no).padStart(2,'0')} — ${it.title}\n${it.link}\n${it.image}\n`).join('\n');
+        }else{
+          stat.innerHTML = `<span class="err">Gagal:</span> ${data.error || 'unknown'}`;
         }
+      }catch(err){
+        stat.innerHTML = `<span class=\"err\">Network error:</span> ${String(err)}`;
       }
-      return items;
-    }
-
-    function merge(oldArr,newArr,start){
-      const maxNo = oldArr.reduce((m,it)=>Math.max(m,Number(it.no||0)),0);
-      let n = Math.max(maxNo+1, Number(start)||1);
-      return [
-        ...oldArr,
-        ...newArr.map(it=>({
-          id: crypto.randomUUID?.()||String(Date.now())+Math.random(),
-          no: n++,
-          name: it.name?.replace(/\s*[:：-]$/,'')||'Item',
-          link: it.link,
-          image: it.image||defaultImg.value||'',
-          price: it.price||'',
-          tags: it.tags||[],
-          created_at: new Date().toISOString().replace('T',' ').slice(0,19)
-        }))
-      ];
-    }
-
-    document.getElementById('preview').addEventListener('click',()=>{
-      const pairs = extractPairs(paste.value||'');
-      const merged = merge(OLD,pairs,startNo.value);
-      result.textContent = JSON.stringify(merged,null,2);
-      window._merged = merged;
-    });
-
-    document.getElementById('download').addEventListener('click',()=>{
-      const data = window._merged||[];
-      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-      const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'products.json'});
-      a.click(); URL.revokeObjectURL(a.href);
     });
   </script>
 </body>
