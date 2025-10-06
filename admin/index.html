@@ -75,7 +75,7 @@
       resBox.innerHTML = '⏳ Mengirim...';
 
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxsqE-P1NSQTK53hgZDygZC4t1i5SPJ7NXuiuM7Huvm4RF_d9xRjmBBwt7i19e_ffQU/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyFPNn7XnvgXKGENRIwe0p3iFrNLXrw6WNWxkloQysI6X2IWom7P-GLVIDqh8HZN7Ga/exec', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ links: links.split('\n') })
