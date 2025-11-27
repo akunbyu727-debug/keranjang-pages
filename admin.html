@@ -1,122 +1,224 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Keranjang — Tambah dari Link Shopee</title>
-  <style>
-    :root{
-      --bg:#0d1117; --card:#161b22; --txt:#e6edf3; --muted:#9da7b3;
-      --brand1:#ff7b00; --brand2:#ff9100; --ok:#4caf50; --err:#ff5252;
-      --stroke:#2a313a;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Tambah Produk</title>
+<style>
+    :root {
+        color-scheme: dark;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:var(--bg); color:var(--txt); display:flex; min-height:100svh;
-      align-items:flex-start; justify-content:center; padding:32px 16px;
+    body {
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+        box-sizing: border-box;
     }
-    .wrap{ width:100%; max-width:820px; }
-    .card{
-      background:var(--card); border:1px solid var(--stroke); border-radius:16px;
-      padding:24px; box-shadow:0 6px 24px rgba(0,0,0,.25);
+    h1 {
+        color: #58a6ff;
+        margin: 0 0 4px 0;
+        font-size: 22px;
     }
-    h1{ margin:0 0 6px; font-size:20px; display:flex; gap:10px; align-items:center }
-    h1 .ico{ font-size:22px }
-    p.legend{ margin:0 0 16px; color:var(--muted) }
-
-    textarea{
-      width:100%; min-height:220px; resize:vertical; border-radius:12px;
-      border:1px solid var(--stroke); background:#0f141a; color:var(--txt);
-      padding:14px; line-height:1.5; font-size:14px; outline:none;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0);
+    .subtitle {
+        font-size: 13px;
+        color: #8b949e;
+        margin-bottom: 16px;
     }
-    textarea:focus{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.06) }
-
-    .row{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap }
-    button{
-      appearance:none; border:0; cursor:pointer; border-radius:12px;
-      padding:12px 18px; font-weight:700; color:#fff;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2));
-      transition:.2s transform, .2s opacity;
+    .tabs {
+        display: inline-flex;
+        border-radius: 999px;
+        background: #161b22;
+        padding: 3px;
+        border: 1px solid #30363d;
+        margin-bottom: 16px;
     }
-    button:hover{ transform:translateY(-1px); opacity:.95 }
-    .ghost{ background:#222b36; color:var(--txt); font-weight:600 }
-    .ghost:hover{ opacity:.9 }
-
-    .result{ margin-top:18px; font-size:14px; line-height:1.6 }
-    .ok{ color:var(--ok) } .err{ color:var(--err) }
-
-    .pre{
-      background:#0f141a; border:1px dashed var(--stroke); border-radius:10px;
-      padding:12px; overflow:auto; max-height:220px;
+    .tab-btn {
+        border: none;
+        background: transparent;
+        color: #8b949e;
+        padding: 7px 16px;
+        font-size: 13px;
+        border-radius: 999px;
+        cursor: pointer;
     }
-    .foot{ margin-top:18px; color:var(--muted); font-size:12px }
-    a{ color:#79c0ff; text-decoration:none }
-    a:hover{ text-decoration:underline }
-  </style>
+    .tab-btn.active {
+        background: #1f6feb;
+        color: #ffffff;
+    }
+    .tab-btn:not(.active):hover {
+        background: #21262d;
+    }
+    .panel {
+        border: 1px solid #30363d;
+        border-radius: 10px;
+        padding: 16px;
+        background: #0d1117;
+        max-width: 800px;
+    }
+    .panel h2 {
+        margin: 0 0 6px 0;
+        font-size: 18px;
+        color: #79c0ff;
+    }
+    .panel p {
+        margin: 4px 0 10px 0;
+        font-size: 13px;
+        color: #8b949e;
+    }
+    textarea {
+        width: 100%;
+        height: 180px;
+        background: #161b22;
+        color: #e6edf3;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        padding: 10px;
+        resize: vertical;
+        box-sizing: border-box;
+        font-size: 13px;
+    }
+    button.action {
+        background: #238636;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    button.action:hover {
+        opacity: 0.9;
+    }
+    .hint {
+        font-size: 11px;
+        color: #8b949e;
+        margin-top: 8px;
+    }
+    .hidden {
+        display: none;
+    }
+    .badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #1f6feb33;
+        color: #79c0ff;
+        margin-left: 4px;
+    }
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1><span class="ico">🛒</span>Admin Keranjang — Tambah dari Link Shopee</h1>
-      <p class="legend">Tempel link produk (satu per baris). Contoh: <code>https://s.shopee.co.id/XXXX</code></p>
-
-      <textarea id="links" placeholder="https://s.shopee.co.id/1qT9kK7G7v
-https://s.shopee.co.id/abc123
-https://shopee.co.id/...."></textarea>
-
-      <div class="row">
-        <button id="btnSend">Tambah ke Sheet (auto judul &amp; gambar)</button>
-        <button class="ghost" id="btnClear">Bersihkan</button>
-      </div>
-
-      <div id="result" class="result"></div>
-      <div id="preview" class="pre" hidden></div>
-
-      <div class="foot">Butuh bantuan? Pastikan Web App Apps Script sudah <em>Anyone</em> &amp; masukkan URL <code>/exec</code> yang benar.</div>
+    <h1>Tambah Produk</h1>
+    <div class="subtitle">
+        Paste banyak link, satu per baris. Idealnya ±300 link per kirim biar aman ⏱️
     </div>
-  </div>
 
-  <script>
-    // === GANTI dengan URL Web App kamu (akhiran /exec) ===
-    const WEBAPP = 'https://script.google.com/macros/s/AKfycby5QrzRdzxQ5uyVf108tGl3byD6Nh71pEc5nywRVb2JHZODByhhU5XyCuBcKnZ_ZZSP/exec';
+    <!-- TAB SWITCHER -->
+    <div class="tabs">
+        <button id="tab-shopee" class="tab-btn active" onclick="setTab('shopee')">
+            Shopee <span class="badge">Shortlink & Product</span>
+        </button>
+        <button id="tab-tiktok" class="tab-btn" onclick="setTab('tiktok')">
+            TikTok <span class="badge">Video & Shop</span>
+        </button>
+    </div>
 
-    const $ = sel => document.querySelector(sel);
-    const $links = $('#links');
-    const $res = $('#result');
-    const $prev = $('#preview');
+    <!-- PANEL SHOPEE -->
+    <div id="panel-shopee" class="panel">
+        <h2>Shopee</h2>
+        <p>Tempel banyak link Shopee (bisa shortlink <code>s.shopee.co.id</code> atau link produk full):</p>
+        <textarea id="ta-shopee" placeholder="https://s.shopee.co.id/xxxx
+https://shopee.co.id/product/123456/987654
+Tas link no 29 https://shopee.co.id/...
+Sandal link no 30 https://s.shopee.co.id/..."></textarea>
+        <button class="action" onclick="kirimBatch('shopee')">Tambah ke Sheet dari Shopee</button>
+        <div class="hint">
+            Tips: Kalau link pakai teks depan (misal: &quot;Tas link no 29 https...&quot;), script tetap ambil URL-nya saja.  
+            Bagi per ±300 link per batch untuk ribuan produk.
+        </div>
+    </div>
 
-    $('#btnClear').onclick = () => {
-      $links.value = '';
-      $res.textContent = '';
-      $prev.hidden = true; $prev.textContent='';
-    };
+    <!-- PANEL TIKTOK -->
+    <div id="panel-tiktok" class="panel hidden">
+        <h2>TikTok</h2>
+        <p>Tempel banyak link TikTok (video / TikTok Shop):</p>
+        <textarea id="ta-tiktok" placeholder="https://www.tiktok.com/@username/video/1234567890
+https://vt.tiktok.com/xxxxxx
+OOTD hijab https://www.tiktok.com/@.../video/...."></textarea>
+        <button class="action" onclick="kirimBatch('tiktok')">Tambah ke Sheet dari TikTok</button>
+        <div class="hint">
+            Selama Google Apps Script kamu ambil <code>og:title</code> &amp; <code>og:image</code>,  
+            TikTok juga akan keisi judul + gambar otomatis sama seperti Shopee.
+        </div>
+    </div>
 
-    $('#btnSend').onclick = async () => {
-      const lines = $links.value.trim().split(/\n+/).map(s=>s.trim()).filter(Boolean);
-      if (!lines.length) { alert('Masukkan minimal satu link.'); return; }
+<script>
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx6vDfSmRyOUYylz9BprdAr_1vKJIBliXXOeOENmFMoYGCDKjO93IyDohZTx58Aoqk/exec";
 
-      $res.innerHTML = '⏳ Mengirim...'; $prev.hidden = true; $prev.textContent='';
+function setTab(name) {
+    const tabs = ['shopee', 'tiktok'];
 
-      try {
-        const fd = new FormData();
-        fd.append('links', lines.join('\n')); // FormData -> tanpa preflight CORS
-
-        const resp = await fetch(WEBAPP, { method:'POST', body:fd });
-        const data = await resp.json();
-
-        if (data && data.ok) {
-          const list = (data.added||[]).map(p => `#${p.no} — ${p.title}`).join('\n');
-          $res.innerHTML = `<span class="ok">✅ Berhasil menambah ${ (data.added||[]).length } produk.</span>`;
-          $prev.hidden = false; $prev.textContent = list || '(tidak ada preview)';
+    tabs.forEach(t => {
+        const btn = document.getElementById('tab-' + t);
+        const panel = document.getElementById('panel-' + t);
+        if (t === name) {
+            btn.classList.add('active');
+            panel.classList.remove('hidden');
         } else {
-          $res.innerHTML = `<span class="err">❌ Gagal: ${ (data && data.error) || 'unknown error' }</span>`;
+            btn.classList.remove('active');
+            panel.classList.add('hidden');
         }
-      } catch (err) {
-        $res.innerHTML = `<span class="err">⚠️ Error koneksi: ${err.message}</span>`;
-      }
-    };
-  </script>
+    });
+}
+
+function extractLinks(raw) {
+    // Ambil semua URL dari teks (kalau ada teks tambahan di depan)
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const links = [];
+    let match;
+    while ((match = urlRegex.exec(raw)) !== null) {
+        links.push(match[1].trim());
+    }
+    return links;
+}
+
+function kirimBatch(source) {
+    const textareaId = source === 'tiktok' ? 'ta-tiktok' : 'ta-shopee';
+    const el = document.getElementById(textareaId);
+    const raw = (el.value || "").trim();
+
+    if (!raw) {
+        alert("Isi link dulu bro 🙏");
+        return;
+    }
+
+    // Bisa handle format: "Tas link no 29 https://shopee..." → tetap ambil URL-nya
+    const list = extractLinks(raw).filter(x => x);
+
+    if (list.length === 0) {
+        alert("Tidak ada URL valid yang ketemu.");
+        return;
+    }
+
+    if (list.length > 300) {
+        const ok = confirm("Total link: " + list.length + ".\nDisarankan maksimal 300 per batch biar aman timeout.\nTetap kirim semua?");
+        if (!ok) return;
+    }
+
+    const params = new URLSearchParams();
+    params.set("mode", "batch");
+    params.set("links", JSON.stringify(list));
+    // Opsional kalau nanti mau dipakai di Apps Script:
+    // params.set("source", source); // 'shopee' atau 'tiktok'
+
+    window.open(WEBAPP_URL + "?" + params.toString(), "_blank");
+}
+</script>
+
 </body>
 </html>
