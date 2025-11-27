@@ -1,212 +1,138 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin – Tambah Produk</title>
+<meta charset="UTF-8" />
+<title>Admin – KeranjangPages</title>
 <style>
-    :root { color-scheme: dark; }
     body {
-        background: #0d1117;
-        color: #e6edf3;
         font-family: Arial, sans-serif;
-        padding: 20px;
+        background: #111;
+        color: #eee;
         margin: 0;
-        box-sizing: border-box;
+        padding: 0;
     }
-    h1 {
-        color: #58a6ff;
-        margin: 0 0 4px 0;
+    .header {
+        padding: 15px;
+        background: #222;
+        text-align: center;
         font-size: 22px;
-    }
-    .subtitle {
-        font-size: 13px;
-        color: #8b949e;
-        margin-bottom: 16px;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
     }
     .tabs {
-        display: inline-flex;
-        border-radius: 999px;
-        background: #161b22;
-        padding: 3px;
-        border: 1px solid #30363d;
-        margin-bottom: 16px;
-    }
-    .tab-btn {
-        border: none;
-        background: transparent;
-        color: #8b949e;
-        padding: 7px 16px;
-        font-size: 13px;
-        border-radius: 999px;
-        cursor: pointer;
         display: flex;
-        align-items: center;
-        gap: 4px;
+        border-bottom: 1px solid #333;
     }
-    .tab-btn span.emoji { font-size: 14px; }
-    .tab-btn.active {
-        background: #1f6feb;
-        color: #ffffff;
+    .tab {
+        flex: 1;
+        padding: 12px;
+        cursor: pointer;
+        text-align: center;
+        background: #1a1a1a;
+        color: #aaa;
     }
-    .tab-btn:not(.active):hover {
-        background: #21262d;
+    .tab.active {
+        background: #333;
+        color: #fff;
+        font-weight: bold;
     }
-    .panel {
-        border: 1px solid #30363d;
-        border-radius: 10px;
-        padding: 16px;
-        background: #0d1117;
-        max-width: 800px;
-    }
-    .panel h2 {
-        margin: 0 0 6px 0;
-        font-size: 18px;
-        color: #79c0ff;
-    }
-    .panel p {
-        margin: 4px 0 10px 0;
-        font-size: 13px;
-        color: #8b949e;
+    .content {
+        padding: 20px;
     }
     textarea {
         width: 100%;
-        height: 180px;
-        background: #161b22;
-        color: #e6edf3;
-        border: 1px solid #30363d;
-        border-radius: 6px;
+        height: 200px;
+        background: #222;
+        color: #eee;
+        border: 1px solid #444;
         padding: 10px;
-        resize: vertical;
-        box-sizing: border-box;
-        font-size: 13px;
+        border-radius: 4px;
     }
-    button.action {
-        background: #238636;
-        color: #ffffff;
+    button {
+        padding: 12px 20px;
+        background: #0a84ff;
         border: none;
-        padding: 10px 20px;
-        font-size: 14px;
-        margin-top: 10px;
-        border-radius: 6px;
+        border-radius: 4px;
+        color: #fff;
         cursor: pointer;
+        margin-top: 10px;
+        font-size: 16px;
     }
-    button.action:hover { opacity: 0.9; }
-    .hint {
-        font-size: 11px;
-        color: #8b949e;
-        margin-top: 8px;
-    }
-    .hidden { display: none; }
-    .badge {
-        display: inline-block;
-        font-size: 11px;
-        padding: 2px 8px;
-        border-radius: 999px;
-        background: #1f6feb33;
-        color: #79c0ff;
-        margin-left: 4px;
+    button:hover { background: #006fe0; }
+    .note {
+        padding: 10px;
+        font-size: 14px;
+        color: #ccc;
     }
 </style>
 </head>
-
 <body>
-    <h1>Tambah Produk</h1>
-    <div class="subtitle">
-        Paste banyak link, satu per baris. Idealnya ±300 link per kirim biar aman ⏱️
+
+<div class="header">Admin Produk — KeranjangPages</div>
+
+<div class="tabs">
+    <div class="tab active" id="tabShopee">Shopee</div>
+    <div class="tab" id="tabTiktok">TikTok / Tokopedia</div>
+</div>
+
+<div class="content">
+
+    <div id="contentShopee">
+        <div class="note">Tempel banyak link Shopee di sini (satu per baris):</div>
+        <textarea id="txtShopee" placeholder="https://shopee.co.id/...."></textarea>
+        <button onclick="sendBatch('shopee')">Tambah ke Sheet (Shopee)</button>
     </div>
 
-    <div class="tabs">
-        <button id="tab-shopee" class="tab-btn active" onclick="setTab('shopee')">
-            <span class="emoji">🛒</span> Shopee <span class="badge">Shortlink & Product</span>
-        </button>
-        <button id="tab-tiktok" class="tab-btn" onclick="setTab('tiktok')">
-            <span class="emoji">🎵</span> TikTok <span class="badge">Video & Shop</span>
-        </button>
+    <div id="contentTiktok" style="display:none;">
+        <div class="note">Tempel banyak link TikTok / vt.tokopedia / vt.tiktok (satu per baris):</div>
+        <textarea id="txtTiktok" placeholder="https://vt.tokopedia.com/..."></textarea>
+        <button onclick="sendBatch('tiktok')">Tambah ke Sheet (TikTok)</button>
     </div>
 
-    <div id="panel-shopee" class="panel">
-        <h2>Shopee</h2>
-        <p>Tempel banyak link Shopee (shortlink atau full link):</p>
-        <textarea id="ta-shopee" placeholder="https://s.shopee.co.id/xxxx
-https://shopee.co.id/product/123456/987654
-Tas link no 29 https://shopee.co.id/...
-Sandal link no 30 https://s.shopee.co.id/..."></textarea>
-        <button class="action" onclick="kirimBatch('shopee')">Tambah ke Sheet dari Shopee</button>
-        <div class="hint">
-            Kalau teksnya seperti &quot;Tas link no 29 https...&quot;, script tetap ambil URL-nya saja.
-        </div>
-    </div>
-
-    <div id="panel-tiktok" class="panel hidden">
-        <h2>TikTok</h2>
-        <p>Tempel banyak link TikTok (video / TikTok Shop):</p>
-        <textarea id="ta-tiktok" placeholder="https://www.tiktok.com/@username/video/1234567890
-https://vt.tiktok.com/xxxxxx
-OOTD hijab https://www.tiktok.com/@.../video/...."></textarea>
-        <button class="action" onclick="kirimBatch('tiktok')">Tambah ke Sheet dari TikTok</button>
-        <div class="hint">
-            Sama seperti Shopee, judul + gambar diambil dari og:title &amp; og:image halaman TikTok.
-        </div>
-    </div>
+</div>
 
 <script>
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby7CL_m56Q56stBL2XhpQ2_Kf8JkIUNwA2pzFOD3yBgkbiwbKgjf-o_ISu_iddnTYLm/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw1WzXwKiAaNFMrvKjxWfMIpGLsbnHs9flhnu0MCbGm2ns_kk8URYlfQzptDH-mmf1Z/exec";
 
-function setTab(name) {
-    const tabs = ['shopee','tiktok'];
-    tabs.forEach(t => {
-        const btn = document.getElementById('tab-' + t);
-        const panel = document.getElementById('panel-' + t);
-        if (t === name) {
-            btn.classList.add('active');
-            panel.classList.remove('hidden');
-        } else {
-            btn.classList.remove('active');
-            panel.classList.add('hidden');
-        }
-    });
-}
+function switchTab(tab) {
+    document.getElementById("tabShopee").classList.remove("active");
+    document.getElementById("tabTiktok").classList.remove("active");
+    document.getElementById("contentShopee").style.display = "none";
+    document.getElementById("contentTiktok").style.display = "none";
 
-function extractLinks(raw) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const links = [];
-    let match;
-    while ((match = urlRegex.exec(raw)) !== null) {
-        links.push(match[1].trim());
+    if (tab === "shopee") {
+        document.getElementById("tabShopee").classList.add("active");
+        document.getElementById("contentShopee").style.display = "block";
+    } else {
+        document.getElementById("tabTiktok").classList.add("active");
+        document.getElementById("contentTiktok").style.display = "block";
     }
-    return links;
 }
 
-function kirimBatch(source) {
-    const textareaId = source === 'tiktok' ? 'ta-tiktok' : 'ta-shopee';
-    const el = document.getElementById(textareaId);
-    const raw = (el.value || "").trim();
+document.getElementById("tabShopee").onclick = () => switchTab("shopee");
+document.getElementById("tabTiktok").onclick = () => switchTab("tiktok");
 
-    if (!raw) {
-        alert("Isi link dulu bro 🙏");
+function sendBatch(source) {
+    const txt = source === "shopee"
+        ? document.getElementById("txtShopee").value
+        : document.getElementById("txtTiktok").value;
+
+    const links = txt.split("\n").map(v => v.trim()).filter(v => v.length > 0);
+    if (!links.length) {
+        alert("Masukkan minimal 1 link.");
         return;
     }
 
-    const list = extractLinks(raw).filter(x => x);
-    if (list.length === 0) {
-        alert("Tidak ada URL valid yang ketemu.");
-        return;
-    }
+    const url = WEBAPP_URL + "?" + new URLSearchParams({
+        mode: "batch",
+        source: source,
+        links: JSON.stringify(links)
+    }).toString();
 
-    if (list.length > 300) {
-        const ok = confirm("Total link: " + list.length +
-            ".\nDisarankan maksimal 300 per batch biar aman timeout.\nTetap kirim semua?");
-        if (!ok) return;
-    }
-
-    const params = new URLSearchParams();
-    params.set("mode", "batch");
-    params.set("links", JSON.stringify(list));
-    params.set("source", source); // <== shopee / tiktok
-
-    window.open(WEBAPP_URL + "?" + params.toString(), "_blank");
+    window.open(url, "_blank");
 }
+
 </script>
+
 </body>
 </html>
