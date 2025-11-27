@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin – Tambah Produk</title>
 <style>
-    :root {
-        color-scheme: dark;
-    }
+    :root { color-scheme: dark; }
     body {
         background: #0d1117;
         color: #e6edf3;
@@ -42,7 +40,11 @@
         font-size: 13px;
         border-radius: 999px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
+    .tab-btn span.emoji { font-size: 14px; }
     .tab-btn.active {
         background: #1f6feb;
         color: #ffffff;
@@ -89,17 +91,13 @@
         border-radius: 6px;
         cursor: pointer;
     }
-    button.action:hover {
-        opacity: 0.9;
-    }
+    button.action:hover { opacity: 0.9; }
     .hint {
         font-size: 11px;
         color: #8b949e;
         margin-top: 8px;
     }
-    .hidden {
-        display: none;
-    }
+    .hidden { display: none; }
     .badge {
         display: inline-block;
         font-size: 11px;
@@ -118,32 +116,28 @@
         Paste banyak link, satu per baris. Idealnya ±300 link per kirim biar aman ⏱️
     </div>
 
-    <!-- TAB SWITCHER -->
     <div class="tabs">
         <button id="tab-shopee" class="tab-btn active" onclick="setTab('shopee')">
-            Shopee <span class="badge">Shortlink & Product</span>
+            <span class="emoji">🛒</span> Shopee <span class="badge">Shortlink & Product</span>
         </button>
         <button id="tab-tiktok" class="tab-btn" onclick="setTab('tiktok')">
-            TikTok <span class="badge">Video & Shop</span>
+            <span class="emoji">🎵</span> TikTok <span class="badge">Video & Shop</span>
         </button>
     </div>
 
-    <!-- PANEL SHOPEE -->
     <div id="panel-shopee" class="panel">
         <h2>Shopee</h2>
-        <p>Tempel banyak link Shopee (bisa shortlink <code>s.shopee.co.id</code> atau link produk full):</p>
+        <p>Tempel banyak link Shopee (shortlink atau full link):</p>
         <textarea id="ta-shopee" placeholder="https://s.shopee.co.id/xxxx
 https://shopee.co.id/product/123456/987654
 Tas link no 29 https://shopee.co.id/...
 Sandal link no 30 https://s.shopee.co.id/..."></textarea>
         <button class="action" onclick="kirimBatch('shopee')">Tambah ke Sheet dari Shopee</button>
         <div class="hint">
-            Tips: Kalau link pakai teks depan (misal: &quot;Tas link no 29 https...&quot;), script tetap ambil URL-nya saja.  
-            Bagi per ±300 link per batch untuk ribuan produk.
+            Kalau teksnya seperti &quot;Tas link no 29 https...&quot;, script tetap ambil URL-nya saja.
         </div>
     </div>
 
-    <!-- PANEL TIKTOK -->
     <div id="panel-tiktok" class="panel hidden">
         <h2>TikTok</h2>
         <p>Tempel banyak link TikTok (video / TikTok Shop):</p>
@@ -152,8 +146,7 @@ https://vt.tiktok.com/xxxxxx
 OOTD hijab https://www.tiktok.com/@.../video/...."></textarea>
         <button class="action" onclick="kirimBatch('tiktok')">Tambah ke Sheet dari TikTok</button>
         <div class="hint">
-            Selama Google Apps Script kamu ambil <code>og:title</code> &amp; <code>og:image</code>,  
-            TikTok juga akan keisi judul + gambar otomatis sama seperti Shopee.
+            Sama seperti Shopee, judul + gambar diambil dari og:title &amp; og:image halaman TikTok.
         </div>
     </div>
 
@@ -161,8 +154,7 @@ OOTD hijab https://www.tiktok.com/@.../video/...."></textarea>
 const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx6vDfSmRyOUYylz9BprdAr_1vKJIBliXXOeOENmFMoYGCDKjO93IyDohZTx58Aoqk/exec";
 
 function setTab(name) {
-    const tabs = ['shopee', 'tiktok'];
-
+    const tabs = ['shopee','tiktok'];
     tabs.forEach(t => {
         const btn = document.getElementById('tab-' + t);
         const panel = document.getElementById('panel-' + t);
@@ -177,7 +169,6 @@ function setTab(name) {
 }
 
 function extractLinks(raw) {
-    // Ambil semua URL dari teks (kalau ada teks tambahan di depan)
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const links = [];
     let match;
@@ -197,28 +188,25 @@ function kirimBatch(source) {
         return;
     }
 
-    // Bisa handle format: "Tas link no 29 https://shopee..." → tetap ambil URL-nya
     const list = extractLinks(raw).filter(x => x);
-
     if (list.length === 0) {
         alert("Tidak ada URL valid yang ketemu.");
         return;
     }
 
     if (list.length > 300) {
-        const ok = confirm("Total link: " + list.length + ".\nDisarankan maksimal 300 per batch biar aman timeout.\nTetap kirim semua?");
+        const ok = confirm("Total link: " + list.length +
+            ".\nDisarankan maksimal 300 per batch biar aman timeout.\nTetap kirim semua?");
         if (!ok) return;
     }
 
     const params = new URLSearchParams();
     params.set("mode", "batch");
     params.set("links", JSON.stringify(list));
-    // Opsional kalau nanti mau dipakai di Apps Script:
-    // params.set("source", source); // 'shopee' atau 'tiktok'
+    params.set("source", source); // <== shopee / tiktok
 
     window.open(WEBAPP_URL + "?" + params.toString(), "_blank");
 }
 </script>
-
 </body>
 </html>
