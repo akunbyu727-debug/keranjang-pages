@@ -8,14 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 20px;
-      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial,
-        sans-serif;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: #0b1622;
       color: #ffffff;
     }
@@ -62,12 +59,8 @@
       border-bottom-color: #ffd8aa;
     }
 
-    .panel {
-      display: none;
-    }
-    .panel.active {
-      display: block;
-    }
+    .panel { display: none; }
+    .panel.active { display: block; }
 
     /* Card / box */
     .box {
@@ -102,9 +95,7 @@
       color: #e5e7eb;
       border: 1px solid #1f2937;
     }
-    textarea::placeholder {
-      color: #6b7280;
-    }
+    textarea::placeholder { color: #6b7280; }
     textarea:focus {
       outline: 2px solid #ff7f00;
       border-color: transparent;
@@ -121,9 +112,7 @@
       cursor: pointer;
       margin-top: 8px;
     }
-    button:hover {
-      background: #ff9933;
-    }
+    button:hover { background: #ff9933; }
 
     .log-title {
       font-size: 13px;
@@ -214,23 +203,16 @@
   </div>
 
   <script>
-    // URL Web App GAS (punya script pertama yang sudah pasti jalan)
+    // ⚠️ PASTIKAN INI SAMA PERSIS DENGAN SCRIPT LAMA YANG SUDAH JALAN
+    // (copy dari admin lama yang jadul tapi sukses nulis ke Sheet)
     const WEBAPP_URL =
       "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
 
     function setTab(name) {
-      document
-        .getElementById("tab-shopee")
-        .classList.toggle("active", name === "shopee");
-      document
-        .getElementById("tab-tiktok")
-        .classList.toggle("active", name === "tiktok");
-      document
-        .getElementById("panel-shopee")
-        .classList.toggle("active", name === "shopee");
-      document
-        .getElementById("panel-tiktok")
-        .classList.toggle("active", name === "tiktok");
+      document.getElementById("tab-shopee").classList.toggle("active", name === "shopee");
+      document.getElementById("tab-tiktok").classList.toggle("active", name === "tiktok");
+      document.getElementById("panel-shopee").classList.toggle("active", name === "shopee");
+      document.getElementById("panel-tiktok").classList.toggle("active", name === "tiktok");
     }
 
     function log(msg) {
@@ -239,7 +221,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // ================== Shopee: ambil meta (judul + gambar) ==================
+    // ============ Shopee: ambil meta (judul + gambar) ============
     async function fetchShopeeMeta(url) {
       try {
         // Proxy sederhana untuk bypass CORS
@@ -250,17 +232,33 @@
         let title = "Produk";
         let image = "";
 
-        // og:title
+        // 1. Coba OG:title
         const t = html.match(
           /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i
         );
-        if (t) title = t[1];
+        if (t && t[1]) {
+          title = t[1];
+        } else {
+          // 2. Fallback: <title>...</title>
+          const t2 = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          if (t2 && t2[1]) {
+            title = t2[1];
+          }
+        }
 
-        // og:image
+        // 3. OG:image
         const i = html.match(
           /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
         );
-        if (i) image = i[1];
+        if (i && i[1]) {
+          image = i[1];
+        } else {
+          // 4. Fallback: cari url img.susercontent.com/file/...
+          const i2 = html.match(/https?:\/\/[^\s"']*img\.susercontent\.com\/file\/[^\s"'<>]+/i);
+          if (i2 && i2[0]) {
+            image = i2[0];
+          }
+        }
 
         return { title, image };
       } catch (err) {
@@ -279,7 +277,7 @@
         return;
       }
 
-      // PENTING: split baris pakai \r?\n (1 backslash)
+      // 1 link per baris
       const links = raw
         .split(/\r?\n/)
         .map((x) => x.trim())
@@ -302,12 +300,14 @@
           source: "shopee",
         });
 
+        const url = WEBAPP_URL + "?" + qs.toString();
+
         try {
-          const res = await fetch(WEBAPP_URL + "?" + qs.toString());
+          const res = await fetch(url);
           const txt = await res.text();
           log("   ✔ Disimpan → " + txt);
         } catch (err) {
-          log("   ✖ Gagal simpan: " + err);
+          log("   ✖ Gagal simpan: " + err + " (URL: " + url + ")");
         }
 
         // delay dikit biar Apps Script & proxy gak keteteran
@@ -317,7 +317,7 @@
       log("\n🎉 Selesai tambah Shopee.");
     }
 
-    // ================== TikTok batch (handleBatch di Apps Script) ==================
+    // ============ TikTok batch (handleBatch di Apps Script) ============
     async function sendTikTok() {
       const links = document.getElementById("tiktok-links").value.trim();
       const titles = document.getElementById("tiktok-titles").value.trim();
@@ -338,12 +338,14 @@
         images,
       });
 
+      const url = WEBAPP_URL + "?" + qs.toString();
+
       try {
-        const res = await fetch(WEBAPP_URL + "?" + qs.toString());
+        const res = await fetch(url);
         const txt = await res.text();
         log("✔ TikTok batch → " + txt);
       } catch (err) {
-        log("✖ ERROR TikTok: " + err);
+        log("✖ ERROR TikTok: " + err + " (URL: " + url + ")");
       }
 
       log("\n🎉 Selesai TikTok.");
