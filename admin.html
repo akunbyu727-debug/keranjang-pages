@@ -136,7 +136,7 @@
     <div id="panel-shopee" class="panel active">
       <div class="box">
         <h2>🛒 Tambah Shopee (Auto Nama + Gambar)</h2>
-        <p>Tempel link Shopee satu per baris. Sistem akan ambil <b>judul & gambar utama</b> otomatis, lalu simpan ke Sheet (A–D) dengan nomor urut baru.</p>
+        <p>Tempel link Shopee satu per baris. Sistem akan ambil <b>judul &amp; gambar utama</b> otomatis, lalu simpan ke Sheet (A–D) dengan nomor urut baru.</p>
         <textarea id="shopee-input" placeholder="https://s.shopee.co.id/....&#10;https://shopee.co.id/product/..."></textarea>
         <button onclick="sendShopee()">Tambah Produk Shopee</button>
       </div>
@@ -165,8 +165,8 @@
   </div>
 
   <script>
-    // 🔗 GUNAKAN WEB APP BARU YANG SUDAH KAMU KIRIM
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzIjOcuTdCvc_BSOaHx-L7DEmpHVmwHbGCVVaMpX0g21I02WhRPocCce12daDdfMpdU/exec";
+    // 🔗 PAKAI WEB APP LAMA YANG SUDAH TERBUKTI JALAN (DARI SCRIPT PERTAMA)
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
 
     function setTab(name){
       document.getElementById("tab-shopee").classList.toggle("active", name === "shopee");
@@ -182,7 +182,7 @@
     }
 
     // ==========================================================
-    //  SHOPEE: auto meta (judul + gambar) mirip bookmark
+    //  SHOPEE: auto meta (judul + gambar) – mirip bookmark
     // ==========================================================
     async function fetchShopeeMeta(url){
       try {
@@ -195,11 +195,11 @@
         let image = "";
 
         // OG:title
-        const t = html.match(/<meta[^>]+property=[\"']og:title[\"'][^>]+content=[\"']([^\"']+)[\"']/i);
+        const t = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
         if (t) title = t[1];
 
         // OG:image
-        const i = html.match(/<meta[^>]+property=[\"']og:image[\"'][^>]+content=[\"']([^\"']+)[\"']/i);
+        const i = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
         if (i) image = i[1];
 
         return { title, image };
@@ -250,6 +250,8 @@
       }
 
       log("\\n🎉 Selesai tambah Shopee.");
+      // optional: kosongkan input setelah sukses
+      // document.getElementById("shopee-input").value = "";
     }
 
     // ==========================================================
@@ -284,6 +286,10 @@
       }
 
       log("\\n🎉 Selesai TikTok.");
+      // optional: kosongkan input setelah sukses
+      // document.getElementById("tiktok-links").value = "";
+      // document.getElementById("tiktok-titles").value = "";
+      // document.getElementById("tiktok-images").value = "";
     }
   </script>
 </body>
