@@ -1,174 +1,159 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Admin – Koleksiku</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Tambah Produk</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-<style>
-body{
-  margin:0; padding:0;
-  font-family:'Inter',sans-serif;
-  background:#0b1622;
-  color:#fff;
-}
-.wrap{
-  max-width:560px;
-  margin:0 auto;
-  padding:20px;
-}
-h1{
-  text-align:center;
-  margin-bottom:12px;
-  font-size:24px;
-  font-weight:700;
-}
-.tabs{
-  display:flex;
-  background:#12202e;
-  border-radius:12px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.tab{
-  flex:1;
-  text-align:center;
-  padding:12px 0;
-  cursor:pointer;
-  background:#12202e;
-  color:#b5c2d3;
-  font-weight:600;
-}
-.tab.active{
-  background:#ffffff;
-  color:#0b1622;
-}
-.box{
-  background:#12202e;
-  padding:16px;
-  border-radius:14px;
-  margin-bottom:18px;
-}
-textarea{
-  width:100%; height:180px;
-  border:none; border-radius:10px;
-  padding:12px;
-  resize:none; outline:none;
-  font-size:14px;
-}
-button{
-  width:100%;
-  padding:14px;
-  background:#ff7f00;
-  border:none; border-radius:12px;
-  color:#fff; font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-}
-button:hover{
-  background:#ffa94d;
-}
-.progress{
-  width:100%; height:10px;
-  background:#334455;
-  border-radius:10px;
-  margin:18px 0;
-  overflow:hidden;
-}
-.progress-bar{
-  width:0%; height:100%;
-  background:#ff7f00;
-  transition:0.3s;
-}
-.log{
-  background:#0f1c2a;
-  padding:14px;
-  border-radius:12px;
-  font-size:13px;
-  max-height:260px;
-  overflow:auto;
-  white-space:pre-wrap;
-}
-</style>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      padding:20px;
+      background:#f5f5f5;
+    }
+    h2{margin-bottom:6px}
+    textarea{
+      width:100%;
+      height:120px;
+      padding:10px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      margin-bottom:10px;
+      font-size:14px;
+      resize: vertical;
+    }
+    button{
+      padding:10px 18px;
+      border:none;
+      background:#ff6b00;
+      color:white;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:14px;
+      margin-top:4px;
+    }
+    button:hover{opacity:0.85}
+    .box{background:white;padding:16px;border-radius:10px;margin-bottom:20px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+    .log{
+      white-space:pre-line;
+      background:#111;
+      color:#0f0;
+      padding:12px;
+      margin-top:15px;
+      border-radius:6px;
+      font-size:13px;
+      height:180px;
+      overflow:auto;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="wrap">
-  <h1>Admin – Koleksiku</h1>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <div id="tab-sh" class="tab active" onclick="setTab('shopee')">🛒 Shopee</div>
-    <div id="tab-tk" class="tab" onclick="setTab('tiktok')">🎵 TikTok</div>
-  </div>
-
-  <!-- INPUT BOX -->
-  <div class="box">
-    <textarea id="links" placeholder="Tempel banyak link di sini...&#10;1 link per baris"></textarea>
-  </div>
-
-  <button onclick="startProcess()">Tambahkan ke Sheet</button>
-
-  <div class="progress"><div class="progress-bar" id="pb"></div></div>
-
-  <div class="log" id="log">Siap menerima link...</div>
+<h2>🔧 Admin Tambah Produk Shopee</h2>
+<div class="box">
+  <p>Masukkan link Shopee (1 per baris):</p>
+  <textarea id="shopee-input" placeholder="https://shopee.co.id/..."></textarea>
+  <button onclick="sendShopee()">Tambah Shopee</button>
 </div>
 
+<h2>🎵 Admin Tambah Produk TikTok</h2>
+<div class="box">
+  <p>Link TikTok (1 per baris):</p>
+  <textarea id="tiktok-links" placeholder="https://www.tiktok.com/..."></textarea>
+
+  <p>Judul (1 per baris, boleh kosong):</p>
+  <textarea id="tiktok-titles" placeholder="Nama produk..."></textarea>
+
+  <p>Gambar (1 per baris, opsional):</p>
+  <textarea id="tiktok-images" placeholder="https://...jpg"></textarea>
+
+  <button onclick="sendTikTok()">Tambah TikTok</button>
+</div>
+
+<h2>📜 Log</h2>
+<div id="log" class="log"></div>
+
 <script>
-// ✅ Web App URL terbaru kamu
-const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbzIjOcuTdCvc_BSOaHx-L7DEmpHVmwHbGCVVaMpX0g21I02WhRPocCce12daDdfMpdU/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
 
-let CURRENT = "shopee";
+/* ====================================================
+      SHOPEE — format EXACT seperti bookmark lama
+   ==================================================== */
+async function sendShopee(){
+    const raw = document.getElementById("shopee-input").value.trim();
+    const logBox = document.getElementById("log");
+    logBox.textContent = "⏳ Mulai kirim Shopee...\n";
 
-function setTab(x){
-  CURRENT = x;
-  document.getElementById("tab-sh").classList.toggle("active", x==="shopee");
-  document.getElementById("tab-tk").classList.toggle("active", x==="tiktok");
-}
-
-function log(msg){
-  const lg = document.getElementById("log");
-  lg.textContent += "\n" + msg;
-  lg.scrollTop = lg.scrollHeight;
-}
-
-async function startProcess(){
-  const lines = document.getElementById("links").value
-    .split("\n")
-    .map(x=>x.trim())
-    .filter(x=>x.length>0);
-
-  if(!lines.length){
-    log("❌ Tidak ada link.");
-    return;
-  }
-
-  log("⏳ Memulai kirim ke Apps Script ("+CURRENT+")...");
-  let done = 0;
-  const total = lines.length;
-
-  for(const link of lines){
-    const params = new URLSearchParams({
-      link: link,
-      no: "",
-      source: CURRENT   // "shopee" atau "tiktok"
-    });
-
-    try{
-      await fetch(WEBAPP_URL + "?" + params.toString(), { method:"GET", mode:"no-cors" });
-      log("✔ Dikirim: " + link);
-    }catch(e){
-      log("❌ Gagal kirim: " + link);
+    if(!raw){
+        alert("Isi link Shopee dulu!");
+        return;
     }
 
-    done++;
-    document.getElementById("pb").style.width = (done/total*100) + "%";
-  }
+    const list = raw.split("\n").map(x => x.trim()).filter(x => x);
 
-  log("🎉 Selesai memproses semua link. Cek Sheet + website.");
+    for(const link of list){
+        const qs = new URLSearchParams({
+            link: link,
+            title: "Produk",
+            image: "",
+            no: "",
+            source: "shopee"
+        });
+
+        const url = WEBAPP_URL + "?" + qs.toString();
+
+        try{
+            const res = await fetch(url);
+            const txt = await res.text();
+
+            logBox.textContent += "✔ " + link + " → " + txt + "\n";
+        }
+        catch(err){
+            logBox.textContent += "✖ " + link + " → ERROR: " + err + "\n";
+        }
+
+        await new Promise(r => setTimeout(r, 300));
+    }
+
+    logBox.textContent += "\n🎉 Selesai Shopee!\n";
+}
+
+/* ====================================================
+      TIKTOK — batch mode (Apps Script sudah mendukung)
+   ==================================================== */
+async function sendTikTok(){
+    const links  = document.getElementById("tiktok-links").value.trim();
+    const titles = document.getElementById("tiktok-titles").value.trim();
+    const images = document.getElementById("tiktok-images").value.trim();
+    const logBox = document.getElementById("log");
+
+    logBox.textContent = "⏳ Mulai kirim TikTok...\n";
+
+    if(!links){
+        alert("Isi minimal link TikTok");
+        return;
+    }
+
+    const qs = new URLSearchParams({
+        mode: "batch",
+        source: "tiktok",
+        links,
+        titles,
+        images
+    });
+
+    const url = WEBAPP_URL + "?" + qs.toString();
+    try{
+        const res = await fetch(url);
+        const txt = await res.text();
+        logBox.textContent += "✔ TikTok batch → " + txt + "\n";
+    }
+    catch(err){
+        logBox.textContent += "✖ ERROR TikTok: " + err + "\n";
+    }
+
+    logBox.textContent += "\n🎉 Selesai TikTok!\n";
 }
 </script>
 
