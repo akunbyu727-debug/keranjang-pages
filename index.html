@@ -20,9 +20,19 @@
       margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg); color:#fff;
     }
+
     .wrap{max-width:480px;margin:0 auto;padding:0 14px 80px}
+
+    /* 🔥 blok paling atas (header + search + tabs) jadi satu sticky */
+    .top-shell{
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg);
+    }
+
     .header{
-      position:sticky; top:0; z-index:3;
+      /* tadinya sticky, sekarang normal karena dibungkus .top-shell */
       background:linear-gradient(90deg,var(--brand2),var(--brand));
       padding:18px 16px 20px; border-radius:0 0 18px 18px; box-shadow:0 6px 14px rgba(0,0,0,.18);
       text-align:center;
@@ -30,12 +40,14 @@
     .header h1{margin:0; font-size:20px; font-weight:800}
     .header p{margin:6px 0 0; font-size:13px; opacity:.9}
 
-    /* 🔥 PATCH: bikin search bar sticky */
-    .search{
-      position: sticky;
-      top: 78px;
-      z-index: 4;
+    .top-inner{
+      max-width:480px;
+      margin:0 auto;
+      padding:0 14px 10px;
+    }
 
+    /* SEARCH – balik normal (tidak sticky sendiri, karena ikut .top-shell) */
+    .search{
       margin:16px 0 10px; 
       background:#fff; 
       border-radius:26px; 
@@ -145,25 +157,31 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>🧺 Rekomendasi Outfit</h1>
-    <p>Inspirasi Outfit Kamu</p>
+
+  <!-- 🔥 BLOK STICKY ATAS: header + search + tabs -->
+  <div class="top-shell">
+    <div class="header">
+      <h1>🧺 Rekomendasi Outfit</h1>
+      <p>Inspirasi Outfit Kamu</p>
+    </div>
+    <div class="top-inner">
+      <div class="search">
+        <input id="q" placeholder="cari/klik disini mau cari bio no berapa..." />
+      </div>
+
+      <div class="tabs">
+        <button id="tab-shopee" class="tab-btn active" onclick="setTab('shopee')">
+          <span class="emoji">🛒</span><span>Shopee</span>
+        </button>
+        <button id="tab-tiktok" class="tab-btn" onclick="setTab('tiktok')">
+          <span class="emoji">🎵</span><span>TikTok</span>
+        </button>
+      </div>
+    </div>
   </div>
 
+  <!-- LIST PRODUK -->
   <div class="wrap">
-    <div class="search">
-      <input id="q" placeholder="cari/klik disini mau cari bio no berapa..." />
-    </div>
-
-    <div class="tabs">
-      <button id="tab-shopee" class="tab-btn active" onclick="setTab('shopee')">
-        <span class="emoji">🛒</span><span>Shopee</span>
-      </button>
-      <button id="tab-tiktok" class="tab-btn" onclick="setTab('tiktok')">
-        <span class="emoji">🎵</span><span>TikTok</span>
-      </button>
-    </div>
-
     <div id="list" class="grid"></div>
     <div id="empty" class="empty" style="display:none">Gagal memuat data.</div>
   </div>
@@ -180,7 +198,6 @@
          alt="Channel WA" loading="lazy">
   </a>
 
-  <!-- script load CSV & render TETAP SAMA, tidak diubah -->
   <script>
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
