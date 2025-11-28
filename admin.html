@@ -8,24 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 20px;
-      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: "Inter", sans-serif;
       background: #0b1622;
       color: #ffffff;
     }
+
     .wrap {
-      max-width: 680px;
+      max-width: 650px;
       margin: 0 auto;
     }
+
     h1 {
-      text-align: center;
-      margin: 0 0 8px;
       font-size: 24px;
-      letter-spacing: 0.02em;
+      text-align: center;
+      margin-bottom: 4px;
     }
+
     .sub {
       text-align: center;
       font-size: 13px;
@@ -36,224 +37,196 @@
     /* Tabs */
     .tabs {
       display: flex;
-      margin-bottom: 16px;
+      background: #111d2a;
       border-radius: 12px;
       overflow: hidden;
-      background: #111d2a;
       border: 1px solid #1f2937;
+      margin-bottom: 16px;
     }
     .tab {
       flex: 1;
       text-align: center;
       padding: 10px 0;
-      cursor: pointer;
-      font-size: 14px;
       font-weight: 600;
       color: #9fb0c4;
-      border-bottom: 2px solid transparent;
+      cursor: pointer;
       user-select: none;
     }
     .tab.active {
       background: #ff7f00;
       color: #ffffff;
-      border-bottom-color: #ffd8aa;
     }
 
+    /* Panel */
     .panel { display: none; }
     .panel.active { display: block; }
 
-    /* Card / box */
+    /* Box */
     .box {
       background: #111d2a;
-      padding: 14px;
+      padding: 16px;
       border-radius: 12px;
-      margin-bottom: 14px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
       border: 1px solid #1f2937;
+      box-shadow: 0px 3px 12px rgba(0,0,0,0.35);
     }
     .box h2 {
+      font-size: 17px;
       margin: 0 0 6px;
-      font-size: 16px;
     }
     .box p {
-      margin: 4px 0 8px;
       font-size: 13px;
       color: #c3d0df;
+      margin: 4px 0 10px;
     }
 
     textarea {
       width: 100%;
       min-height: 110px;
-      resize: vertical;
-      border-radius: 8px;
-      border: none;
+      border-radius: 10px;
       padding: 10px;
       font-size: 13px;
-      font-family: inherit;
-      outline: none;
       background: #020617;
-      color: #e5e7eb;
       border: 1px solid #1f2937;
-    }
-    textarea::placeholder { color: #6b7280; }
-    textarea:focus {
-      outline: 2px solid #ff7f00;
-      border-color: transparent;
+      color: #e5e7eb;
+      resize: vertical;
     }
 
     button {
       padding: 10px 18px;
-      border: none;
       border-radius: 999px;
+      border: none;
       background: #ff7f00;
-      color: #ffffff;
-      font-weight: 600;
+      color: #fff;
+      font-weight: 700;
       font-size: 14px;
       cursor: pointer;
       margin-top: 8px;
     }
     button:hover { background: #ff9933; }
 
+    /* Log */
     .log-title {
+      margin-top: 10px;
+      margin-bottom: 4px;
       font-size: 13px;
-      margin: 12px 0 4px;
       color: #c3d0df;
     }
+
     .log {
       background: #020617;
       border-radius: 10px;
       padding: 10px;
       font-size: 12px;
-      white-space: pre-line;
-      max-height: 260px;
-      overflow-y: auto;
       border: 1px solid #1f2937;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
+      height: 220px;
+      overflow-y: auto;
+      white-space: pre-line;
+      font-family: monospace;
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>Admin – Koleksiku</h1>
-    <div class="sub">
-      Tambah produk ke Sheet • Shopee auto judul + gambar • TikTok batch
-    </div>
 
-    <!-- TABS -->
-    <div class="tabs">
-      <div id="tab-shopee" class="tab active" onclick="setTab('shopee')">
-        🛒 Shopee
-      </div>
-      <div id="tab-tiktok" class="tab" onclick="setTab('tiktok')">
-        🎵 TikTok
-      </div>
-    </div>
+<div class="wrap">
+  <h1>Admin – Koleksiku</h1>
+  <div class="sub">Tambah produk Shopee otomatis • Judul & Gambar langsung ke Sheet</div>
 
-    <!-- PANEL SHOPEE -->
-    <div id="panel-shopee" class="panel active">
-      <div class="box">
-        <h2>🛒 Tambah Shopee (Auto Nama + Gambar)</h2>
-        <p>
-          Tempel link Shopee <b>1 per baris</b>. Sistem akan kirim ke WebApp,
-          lalu Apps Script yang ambil <b>judul &amp; gambar</b> dan simpan ke Sheet.
-        </p>
-        <textarea
-          id="shopee-input"
-          placeholder="https://s.shopee.co.id/....&#10;https://shopee.co.id/product/..."
-        ></textarea>
-        <button onclick="sendShopee()">Tambah Produk Shopee</button>
-      </div>
-    </div>
-
-    <!-- PANEL TIKTOK -->
-    <div id="panel-tiktok" class="panel">
-      <div class="box">
-        <h2>🎵 Tambah TikTok (Batch)</h2>
-        <p>
-          Bagian TikTok belum disambung ke Apps Script yang baru.
-          Nanti kalau sudah siap endpoint-nya, kita sambungin lagi.
-        </p>
-        <textarea
-          id="tiktok-links"
-          placeholder="(belum aktif)"
-          disabled
-        ></textarea>
-        <button onclick="alert('Endpoint TikTok belum diset di Code.gs, bro. Nanti kita sambungin kalau sudah siap.')">
-          Coming soon
-        </button>
-      </div>
-    </div>
-
-    <!-- LOG -->
-    <div class="log-title">📜 Log proses</div>
-    <div id="log" class="log">Siap menerima perintah…</div>
+  <!-- TABS -->
+  <div class="tabs">
+    <div id="tab-shopee" onclick="setTab('shopee')" class="tab active">🛒 Shopee</div>
+    <div id="tab-tiktok" onclick="setTab('tiktok')" class="tab">🎵 TikTok</div>
   </div>
 
-  <script>
-    // ✅ ini sudah pakai URL WebApp yang kamu sebut
-    const WEBAPP_URL =
-      "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
+  <!-- SHOPEE PANEL -->
+  <div id="panel-shopee" class="panel active">
+    <div class="box">
+      <h2>🛒 Tambah Shopee</h2>
+      <p>Tempel link Shopee <b>1 per baris</b>. Sistem otomatis ambil <b>nama produk + gambar</b>.</p>
 
-    function setTab(name) {
-      document.getElementById("tab-shopee").classList.toggle("active", name === "shopee");
-      document.getElementById("tab-tiktok").classList.toggle("active", name === "tiktok");
-      document.getElementById("panel-shopee").classList.toggle("active", name === "shopee");
-      document.getElementById("panel-tiktok").classList.toggle("active", name === "tiktok");
+      <textarea id="shopee-input" placeholder="https://s.shopee.co.id/abc123&#10;https://s.shopee.co.id/xyz456"></textarea>
+      <button onclick="sendShopee()">Tambah Produk Shopee</button>
+    </div>
+  </div>
+
+  <!-- TIKTOK PANEL -->
+  <div id="panel-tiktok" class="panel">
+    <div class="box">
+      <h2>🎵 TikTok (Coming soon)</h2>
+      <textarea placeholder="Belum aktif" disabled></textarea>
+      <button disabled>Menunggu endpoint TikTok</button>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-title">📜 Log proses</div>
+  <div id="log" class="log">Siap menerima perintah…</div>
+</div>
+
+<script>
+  // URL WebApp GAS — SUDAH DIISI
+  const WEBAPP_URL =
+    "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
+
+  function setTab(x) {
+    document.getElementById("tab-shopee").classList.toggle("active", x === "shopee");
+    document.getElementById("tab-tiktok").classList.toggle("active", x === "tiktok");
+
+    document.getElementById("panel-shopee").classList.toggle("active", x === "shopee");
+    document.getElementById("panel-tiktok").classList.toggle("active", x === "tiktok");
+  }
+
+  function log(msg) {
+    const L = document.getElementById("log");
+    L.textContent += "\n" + msg;
+    L.scrollTop = L.scrollHeight;
+  }
+
+  // ==============================
+  // 🔥 SHOPEE — KIRIM VIA GET
+  // ==============================
+  async function sendShopee() {
+    const raw = document.getElementById("shopee-input").value.trim();
+
+    document.getElementById("log").textContent = "⏳ Mulai proses Shopee...\n";
+
+    if (!raw) {
+      alert("Isi dulu link Shopee-nya bro.");
+      return;
     }
 
-    function log(msg) {
-      const box = document.getElementById("log");
-      box.textContent += "\n" + msg;
-      box.scrollTop = box.scrollHeight;
-    }
+    const linksArr = raw
+      .split(/\r?\n/)
+      .map(s => s.trim())
+      .filter(Boolean);
 
-    // ============ Shopee: kirim list link ke WebApp via POST JSON ============
-    async function sendShopee() {
-      const raw = document.getElementById("shopee-input").value.trim();
-      const logBox = document.getElementById("log");
-      logBox.textContent = "⏳ Mulai proses Shopee...\n";
+    log("Total link: " + linksArr.length);
 
-      if (!raw) {
-        alert("Isi link Shopee dulu, bro.");
-        return;
-      }
+    try {
+      // Kirim semua link sebagai satu parameter GET
+      const qs = new URLSearchParams({ links: raw });
+      const url = WEBAPP_URL + "?" + qs.toString();
 
-      // 1 link per baris
-      const links = raw
-        .split(/\r?\n/)
-        .map((x) => x.trim())
-        .filter(Boolean);
-
-      if (!links.length) {
-        alert("Nggak ada link valid.");
-        return;
-      }
-
-      log("Total link: " + links.length);
+      const res = await fetch(url);  // SIMPLE GET → 100% anti CORS
+      let txt;
 
       try {
-        // TANPA set Content-Type → browser pakai text/plain (simple CORS, no preflight)
-        const res = await fetch(WEBAPP_URL, {
-          method: "POST",
-          body: JSON.stringify({ links })
-        });
-
-        let txt;
-        try {
-          const data = await res.json();
-          txt = JSON.stringify(data);
-        } catch (_) {
-          txt = await res.text();
-        }
-        log("✔ Respon WebApp: " + txt);
+        const data = await res.json();
+        txt = JSON.stringify(data);
       } catch (err) {
-        log("✖ Gagal kirim ke WebApp: " + err);
+        txt = await res.text();
       }
 
-      log("\n🎉 Selesai, cek sheet 'data' apakah baris baru sudah masuk.");
+      log("✔ Respon WebApp: " + txt);
+
+    } catch(e) {
+      log("✖ ERROR menghubungi WebApp: " + e);
     }
-  </script>
+
+    log("\n🎉 Selesai. Cek sheet 'data' apakah baris baru sudah masuk.");
+  }
+</script>
+
 </body>
 </html>
