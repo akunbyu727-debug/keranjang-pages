@@ -117,7 +117,8 @@ button:hover{
 </div>
 
 <script>
-const WEBAPP_URL = 
+// ✅ Web App URL terbaru kamu
+const WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbw1WzXwKiAaNFMrvKjxWfMIpGLsbnHs9flhnu0MCbGm2ns_kk8URYlfQzptDH-mmf1Z/exec";
 
 let CURRENT = "shopee";
@@ -134,24 +135,6 @@ function log(msg){
   lg.scrollTop = lg.scrollHeight;
 }
 
-async function fetchMeta(url){
-  try{
-    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
-    const html = await res.text();
-
-    const title = html.match(/<meta property="og:title" content="([^"]*)"/i)?.[1]
-               || html.match(/<title>([^<]*)<\/title>/i)?.[1]
-               || "Produk";
-
-    const image = html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1]
-               || "";
-
-    return { title, image };
-  }catch(e){
-    return { title:"Produk", image:"" };
-  }
-}
-
 async function startProcess(){
   const lines = document.getElementById("links").value
     .split("\n")
@@ -163,32 +146,29 @@ async function startProcess(){
     return;
   }
 
-  log("⏳ Memulai...");
+  log("⏳ Memulai kirim ke Apps Script ("+CURRENT+")...");
   let done = 0;
+  const total = lines.length;
 
-  for(let link of lines){
-    const meta = await fetchMeta(link);
-
+  for(const link of lines){
     const params = new URLSearchParams({
       link: link,
-      title: meta.title,
-      image: meta.image,
       no: "",
-      source: CURRENT
+      source: CURRENT   // "shopee" atau "tiktok"
     });
 
     try{
-      await fetch(WEBAPP_URL + "?" + params.toString());
-      log("✔ Berhasil: " + link);
-    }catch{
-      log("❌ Gagal: " + link);
+      await fetch(WEBAPP_URL + "?" + params.toString(), { method:"GET", mode:"no-cors" });
+      log("✔ Dikirim: " + link);
+    }catch(e){
+      log("❌ Gagal kirim: " + link);
     }
 
     done++;
-    document.getElementById("pb").style.width = (done/lines.length*100)+"%";
+    document.getElementById("pb").style.width = (done/total*100) + "%";
   }
 
-  log("🎉 Selesai menambahkan semua link.");
+  log("🎉 Selesai memproses semua link. Cek Sheet + website.");
 }
 </script>
 
