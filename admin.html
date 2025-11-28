@@ -1,122 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin – Koleksiku</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body{
-      margin:0;
-      padding:20px;
-      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:#0b1622;
-      color:#fff;
+    * {
+      box-sizing: border-box;
     }
-    .wrap{
-      max-width:620px;
-      margin:0 auto;
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial,
+        sans-serif;
+      background: #0b1622;
+      color: #ffffff;
     }
-    h1{
-      text-align:center;
-      margin-bottom:10px;
-      font-size:24px;
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
     }
-    .sub{
-      text-align:center;
-      font-size:13px;
-      color:#c3d0df;
-      margin-bottom:18px;
+    h1 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 24px;
+      letter-spacing: 0.02em;
     }
-    .tabs{
-      display:flex;
-      margin-bottom:16px;
-      border-radius:12px;
-      overflow:hidden;
-      background:#111d2a;
+    .sub {
+      text-align: center;
+      font-size: 13px;
+      color: #c3d0df;
+      margin-bottom: 18px;
     }
-    .tab{
-      flex:1;
-      text-align:center;
-      padding:10px 0;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:600;
-      color:#9fb0c4;
-      border-bottom:2px solid transparent;
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #111d2a;
+      border: 1px solid #1f2937;
     }
-    .tab.active{
-      background:#ff7f00;
-      color:#fff;
-      border-bottom-color:#ffd8aa;
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #9fb0c4;
+      border-bottom: 2px solid transparent;
+      user-select: none;
     }
-    .panel{
-      display:none;
+    .tab.active {
+      background: #ff7f00;
+      color: #ffffff;
+      border-bottom-color: #ffd8aa;
     }
-    .panel.active{
-      display:block;
+
+    .panel {
+      display: none;
     }
-    .box{
-      background:#111d2a;
-      padding:14px;
-      border-radius:12px;
-      margin-bottom:14px;
-      box-shadow:0 3px 12px rgba(0,0,0,0.35);
+    .panel.active {
+      display: block;
     }
-    .box h2{
-      margin:0 0 6px;
-      font-size:16px;
+
+    /* Card / box */
+    .box {
+      background: #111d2a;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      border: 1px solid #1f2937;
     }
-    .box p{
-      margin:4px 0 8px;
-      font-size:13px;
-      color:#c3d0df;
+    .box h2 {
+      margin: 0 0 6px;
+      font-size: 16px;
     }
-    textarea{
-      width:100%;
-      min-height:110px;
-      resize:vertical;
-      border-radius:8px;
-      border:none;
-      padding:10px;
-      font-size:13px;
-      font-family:inherit;
-      box-sizing:border-box;
-      outline:none;
+    .box p {
+      margin: 4px 0 8px;
+      font-size: 13px;
+      color: #c3d0df;
     }
-    textarea:focus{
-      outline:2px solid #ff7f00;
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
     }
-    button{
-      padding:10px 18px;
-      border:none;
-      border-radius:999px;
-      background:#ff7f00;
-      color:#fff;
-      font-weight:600;
-      font-size:14px;
-      cursor:pointer;
-      margin-top:8px;
+    textarea::placeholder {
+      color: #6b7280;
     }
-    button:hover{
-      background:#ff9933;
+    textarea:focus {
+      outline: 2px solid #ff7f00;
+      border-color: transparent;
     }
-    .log{
-      background:#050910;
-      border-radius:10px;
-      padding:10px;
-      font-size:12px;
-      white-space:pre-line;
-      max-height:260px;
-      overflow:auto;
-      border:1px solid #1f2937;
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 999px;
+      background: #ff7f00;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
     }
-    .log-title{
-      font-size:13px;
-      margin:12px 0 4px;
-      color:#c3d0df;
+    button:hover {
+      background: #ff9933;
+    }
+
+    .log-title {
+      font-size: 13px;
+      margin: 12px 0 4px;
+      color: #c3d0df;
+    }
+    .log {
+      background: #020617;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      white-space: pre-line;
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #1f2937;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
     }
   </style>
 </head>
@@ -124,20 +148,33 @@
 <body>
   <div class="wrap">
     <h1>Admin – Koleksiku</h1>
-    <div class="sub">Tambah produk ke Sheet • Shopee auto judul + gambar, TikTok batch</div>
+    <div class="sub">
+      Tambah produk ke Sheet • Shopee auto judul + gambar • TikTok batch
+    </div>
 
     <!-- TABS -->
     <div class="tabs">
-      <div id="tab-shopee" class="tab active" onclick="setTab('shopee')">🛒 Shopee</div>
-      <div id="tab-tiktok" class="tab" onclick="setTab('tiktok')">🎵 TikTok</div>
+      <div id="tab-shopee" class="tab active" onclick="setTab('shopee')">
+        🛒 Shopee
+      </div>
+      <div id="tab-tiktok" class="tab" onclick="setTab('tiktok')">
+        🎵 TikTok
+      </div>
     </div>
 
     <!-- PANEL SHOPEE -->
     <div id="panel-shopee" class="panel active">
       <div class="box">
         <h2>🛒 Tambah Shopee (Auto Nama + Gambar)</h2>
-        <p>Tempel link Shopee satu per baris. Sistem akan ambil <b>judul &amp; gambar utama</b> otomatis, lalu simpan ke Sheet (A–D) dengan nomor urut baru.</p>
-        <textarea id="shopee-input" placeholder="https://s.shopee.co.id/....&#10;https://shopee.co.id/product/..."></textarea>
+        <p>
+          Tempel link Shopee <b>1 per baris</b>. Sistem akan ambil
+          <b>judul &amp; gambar utama</b> otomatis, lalu simpan ke Sheet
+          (link, title, image, no) dengan nomor urut baru.
+        </p>
+        <textarea
+          id="shopee-input"
+          placeholder="https://s.shopee.co.id/....&#10;https://shopee.co.id/product/..."
+        ></textarea>
         <button onclick="sendShopee()">Tambah Produk Shopee</button>
       </div>
     </div>
@@ -147,13 +184,25 @@
       <div class="box">
         <h2>🎵 Tambah TikTok (Batch H–N)</h2>
         <p>Link TikTok (1 per baris):</p>
-        <textarea id="tiktok-links" placeholder="https://www.tiktok.com/....&#10;https://vt.tiktok.com/..."></textarea>
+        <textarea
+          id="tiktok-links"
+          placeholder="https://www.tiktok.com/....&#10;https://vt.tiktok.com/..."
+        ></textarea>
 
-        <p>Judul (optional, 1 per baris – boleh dikosongkan, akan digantikan 'Produk'):</p>
-        <textarea id="tiktok-titles" placeholder="Nama produk 1&#10;Nama produk 2"></textarea>
+        <p>
+          Judul (opsional, 1 per baris – jika kosong akan diisi
+          <b>&quot;Produk&quot;</b>):
+        </p>
+        <textarea
+          id="tiktok-titles"
+          placeholder="Nama produk 1&#10;Nama produk 2"
+        ></textarea>
 
-        <p>URL gambar (optional, 1 per baris):</p>
-        <textarea id="tiktok-images" placeholder="https://...jpg&#10;https://...jpg"></textarea>
+        <p>URL gambar (opsional, 1 per baris – boleh dikosongkan):</p>
+        <textarea
+          id="tiktok-images"
+          placeholder="https://...jpg&#10;https://...jpg"
+        ></textarea>
 
         <button onclick="sendTikTok()">Tambah Produk TikTok</button>
       </div>
@@ -165,26 +214,33 @@
   </div>
 
   <script>
-    // 🔗 PAKAI WEB APP LAMA YANG SUDAH TERBUKTI JALAN (DARI SCRIPT PERTAMA)
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
+    // URL Web App GAS (punya script pertama yang sudah pasti jalan)
+    const WEBAPP_URL =
+      "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
 
-    function setTab(name){
-      document.getElementById("tab-shopee").classList.toggle("active", name === "shopee");
-      document.getElementById("tab-tiktok").classList.toggle("active", name === "tiktok");
-      document.getElementById("panel-shopee").classList.toggle("active", name === "shopee");
-      document.getElementById("panel-tiktok").classList.toggle("active", name === "tiktok");
+    function setTab(name) {
+      document
+        .getElementById("tab-shopee")
+        .classList.toggle("active", name === "shopee");
+      document
+        .getElementById("tab-tiktok")
+        .classList.toggle("active", name === "tiktok");
+      document
+        .getElementById("panel-shopee")
+        .classList.toggle("active", name === "shopee");
+      document
+        .getElementById("panel-tiktok")
+        .classList.toggle("active", name === "tiktok");
     }
 
-    function log(msg){
+    function log(msg) {
       const box = document.getElementById("log");
-      box.textContent += "\\n" + msg;
+      box.textContent += "\n" + msg;
       box.scrollTop = box.scrollHeight;
     }
 
-    // ==========================================================
-    //  SHOPEE: auto meta (judul + gambar) – mirip bookmark
-    // ==========================================================
-    async function fetchShopeeMeta(url){
+    // ================== Shopee: ambil meta (judul + gambar) ==================
+    async function fetchShopeeMeta(url) {
       try {
         // Proxy sederhana untuk bypass CORS
         const proxied = "https://cors.isomorphic-git.org/" + url;
@@ -194,35 +250,44 @@
         let title = "Produk";
         let image = "";
 
-        // OG:title
-        const t = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+        // og:title
+        const t = html.match(
+          /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i
+        );
         if (t) title = t[1];
 
-        // OG:image
-        const i = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        // og:image
+        const i = html.match(
+          /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
+        );
         if (i) image = i[1];
 
         return { title, image };
-      } catch(err){
+      } catch (err) {
         console.log("Gagal fetch Shopee meta:", err);
         return { title: "Produk", image: "" };
       }
     }
 
-    async function sendShopee(){
+    async function sendShopee() {
       const raw = document.getElementById("shopee-input").value.trim();
       const logBox = document.getElementById("log");
-      logBox.textContent = "⏳ Mulai proses Shopee...\\n";
+      logBox.textContent = "⏳ Mulai proses Shopee...\n";
 
-      if(!raw){
+      if (!raw) {
         alert("Isi link Shopee dulu, bro.");
         return;
       }
 
-      const links = raw.split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+      // PENTING: split baris pakai \r?\n (1 backslash)
+      const links = raw
+        .split(/\r?\n/)
+        .map((x) => x.trim())
+        .filter(Boolean);
+
       let idx = 0;
 
-      for (const link of links){
+      for (const link of links) {
         idx++;
         log("[" + idx + "/" + links.length + "] Ambil meta: " + link);
 
@@ -234,38 +299,34 @@
           title: meta.title || "Produk",
           image: meta.image || "",
           no: "",
-          source: "shopee"
+          source: "shopee",
         });
 
         try {
           const res = await fetch(WEBAPP_URL + "?" + qs.toString());
           const txt = await res.text();
           log("   ✔ Disimpan → " + txt);
-        } catch(err){
+        } catch (err) {
           log("   ✖ Gagal simpan: " + err);
         }
 
-        // delay sedikit biar gak ngebom Apps Script / proxy
-        await new Promise(r => setTimeout(r, 400));
+        // delay dikit biar Apps Script & proxy gak keteteran
+        await new Promise((r) => setTimeout(r, 400));
       }
 
-      log("\\n🎉 Selesai tambah Shopee.");
-      // optional: kosongkan input setelah sukses
-      // document.getElementById("shopee-input").value = "";
+      log("\n🎉 Selesai tambah Shopee.");
     }
 
-    // ==========================================================
-    //  TIKTOK: tetap batch, kirim ke handleBatch di Apps Script
-    // ==========================================================
-    async function sendTikTok(){
-      const links  = document.getElementById("tiktok-links").value.trim();
+    // ================== TikTok batch (handleBatch di Apps Script) ==================
+    async function sendTikTok() {
+      const links = document.getElementById("tiktok-links").value.trim();
       const titles = document.getElementById("tiktok-titles").value.trim();
       const images = document.getElementById("tiktok-images").value.trim();
       const logBox = document.getElementById("log");
-      logBox.textContent = "⏳ Mulai proses TikTok...\\n";
+      logBox.textContent = "⏳ Mulai proses TikTok...\n";
 
-      if(!links){
-        alert("Isi minimal link TikTok dulu.");
+      if (!links) {
+        alert("Isi minimal link TikTok dulu, bro.");
         return;
       }
 
@@ -274,22 +335,18 @@
         source: "tiktok",
         links,
         titles,
-        images
+        images,
       });
 
       try {
         const res = await fetch(WEBAPP_URL + "?" + qs.toString());
         const txt = await res.text();
         log("✔ TikTok batch → " + txt);
-      } catch(err){
+      } catch (err) {
         log("✖ ERROR TikTok: " + err);
       }
 
-      log("\\n🎉 Selesai TikTok.");
-      // optional: kosongkan input setelah sukses
-      // document.getElementById("tiktok-links").value = "";
-      // document.getElementById("tiktok-titles").value = "";
-      // document.getElementById("tiktok-images").value = "";
+      log("\n🎉 Selesai TikTok.");
     }
   </script>
 </body>
