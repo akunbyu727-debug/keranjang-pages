@@ -163,27 +163,27 @@
 
   <!-- FLOAT WA + TELE -->
   <a class="fab fab-tele" href="https://t.me/infobelanjagratisshopee" target="_blank">
-    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
   </a>
 
   <a class="fab fab-wa" href="https://whatsapp.com/channel/0029VbAjaXOBvvsiyKOMZn2s" target="_blank">
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
   </a>
 
   <!-- SCRIPT CSV + FILTER -->
   <script>
     const SHEET_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
 
     const NO_IMAGE = "https://via.placeholder.com/300x300?text=No+Image";
 
     let ALL = [];
     let CURRENT_TAB = "shopee";
 
-    function isShopee(l){return /shopee\.co\.id|s\.shopee/i.test(l);}
-    function isTikTok(l){return /tiktok\.com|vt\.tiktok\.com/i.test(l);}
+    function isShopee(l){return /shopee\.co\.id|s\.shopee/i.test(l || "");}
+    function isTikTok(l){return /tiktok\.com|vt\.tiktok\.com/i.test(l || "");}
 
-    function openLink(l){window.open(l,"_blank");}
+    function openLink(l){ if (l) window.open(l,"_blank"); }
 
     function setTab(x){
       CURRENT_TAB = x;
@@ -192,8 +192,43 @@
       render();
     }
 
+    // 🔧 CSV parser aman (handle koma di dalam "")
+    function parseCSV(str) {
+      const rows = [];
+      let cur = '';
+      let row = [];
+      let inQuotes = false;
+
+      for (let i = 0; i < str.length; i++) {
+        const c = str[i];
+        if (c === '"') {
+          if (inQuotes && str[i+1] === '"') { 
+            cur += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (c === ',' && !inQuotes) {
+          row.push(cur);
+          cur = '';
+        } else if ((c === '\n' || c === '\r') && !inQuotes) {
+          if (cur || row.length) row.push(cur);
+          if (row.length) rows.push(row);
+          cur = '';
+          row = [];
+        } else {
+          cur += c;
+        }
+      }
+      if (cur || row.length) row.push(cur);
+      if (row.length) rows.push(row);
+      return rows;
+    }
+
     function render(list = ALL){
-      const q = document.getElementById("q").value.toLowerCase();
+      // 🔥 TRIM biar spasi dari keyboard HP gak ganggu
+      const q = document.getElementById("q").value.trim().toLowerCase();
+
       const wrap = document.getElementById("list");
       wrap.innerHTML = "";
       const empty = document.getElementById("empty");
@@ -222,12 +257,12 @@
       items.forEach(p=>{
         const img = p.image || NO_IMAGE;
         wrap.innerHTML += `
-          <div class="card" onclick="openLink('${p.link}')">
+          <div class="card" onclick="openLink('${p.link || ""}')">
             <div class="thumb">
               <img src="${img}">
             </div>
             <div class="body">
-              <div class="name">#${p.no || ''} ${p.name||'Produk'}</div>
+              <div class="name">#${p.no || ''} ${p.name || 'Produk'}</div>
               ${p.price ? `<div class="price">${p.price}</div>` : ""}
               <div class="badge-platform">${p.platform}</div>
             </div>
@@ -240,33 +275,56 @@
       try{
         const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
         const csv = await res.text();
-        const rows = csv.trim().split(/\r?\n/).map(x=>x.split(","));
+
+        const rows = parseCSV(csv);
+        if (!rows.length) return;
+
         const [head, ...data] = rows;
+        const idx = Object.fromEntries(
+          head.map((h,i)=>[(h || "").trim().toLowerCase(), i])
+        );
 
-        const idx = Object.fromEntries(head.map((h,i)=>[h.trim().toLowerCase(), i]));
+        function get(row, key){
+          const i = idx[key];
+          if (i === undefined) return "";
+          return (row[i] || "").trim();
+        }
 
-        ALL = data.map(r=>({
-          no: r[idx["no"]],
-          name: r[idx["name"]],
-          link: r[idx["link"]],
-          image: r[idx["image"]],
-          price: r[idx["price"]],
-          tags: r[idx["tags"]],
-          platform: r[idx["platform"]],
-          no_tk: r[idx["no_tk"]],
-          name_tk: r[idx["name_tk"]],
-          link_tk: r[idx["link_tk"]],
-          image_tk: r[idx["image_tk"]],
-          price_tk: r[idx["price_tk"]],
-          tags_tk: r[idx["tags_tk"]],
-          platform_tk: r[idx["platform_tk"]],
-        }))
-        .flatMap(p=>[
+        const raw = data.map(r=>({
+          no: get(r,"no"),
+          name: get(r,"name"),
+          link: get(r,"link"),
+          image: get(r,"image"),
+          price: get(r,"price"),
+          tags: get(r,"tags"),
+          platform: get(r,"platform"),
+          no_tk: get(r,"no_tk"),
+          name_tk: get(r,"name_tk"),
+          link_tk: get(r,"link_tk"),
+          image_tk: get(r,"image_tk"),
+          price_tk: get(r,"price_tk"),
+          tags_tk: get(r,"tags_tk"),
+          platform_tk: get(r,"platform_tk"),
+        }));
+
+        ALL = raw.flatMap(p=>[
           p.link ? {
-            no:p.no, name:p.name, link:p.link, image:p.image, price:p.price, tags:p.tags, platform:"Shopee"
+            no:p.no,
+            name:p.name || "Produk",
+            link:p.link,
+            image:p.image,
+            price:p.price,
+            tags:p.tags,
+            platform:p.platform || "Shopee"
           } : null,
           p.link_tk ? {
-            no:p.no_tk, name:p.name_tk, link:p.link_tk, image:p.image_tk, price:p.price_tk, tags:p.tags_tk, platform:"TikTok"
+            no:p.no_tk,
+            name:p.name_tk || "Produk",
+            link:p.link_tk,
+            image:p.image_tk,
+            price:p.price_tk,
+            tags:p.tags_tk,
+            platform:p.platform_tk || "TikTok"
           } : null
         ].filter(Boolean));
 
@@ -276,7 +334,7 @@
       }
     }
 
-    // ⬇⬇⬇ CUMA BARIS INI YANG DIUBAH
+    // ✅ Panggil render tanpa kirim event
     document.getElementById("q").addEventListener("input", () => render());
 
     loadData();
