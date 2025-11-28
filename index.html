@@ -170,7 +170,7 @@
     <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
   </a>
 
-  <!-- SCRIPT CSV + FILTER TIDAK DIUBAH -->
+  <!-- SCRIPT CSV + FILTER -->
   <script>
     const SHEET_CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnrxnXyTSBK5-681-9abCMWcJZMWUIVhr3z4uhKiiFOf-qPXmKsgc307TAoGniV6ryu-plqUSaCw23/pub?gid=0&single=true&output=csv";
@@ -276,7 +276,9 @@
       }
     }
 
-    document.getElementById("q").addEventListener("input", render);
+    // ⬇⬇⬇ CUMA BARIS INI YANG DIUBAH
+    document.getElementById("q").addEventListener("input", () => render());
+
     loadData();
   </script>
 
