@@ -156,9 +156,8 @@
       <div class="box">
         <h2>🛒 Tambah Shopee (Auto Nama + Gambar)</h2>
         <p>
-          Tempel link Shopee <b>1 per baris</b>. Sistem akan ambil
-          <b>judul &amp; gambar utama</b> otomatis, lalu simpan ke Sheet
-          (link, title, image, no) dengan nomor urut baru.
+          Tempel link Shopee <b>1 per baris</b>. Sistem akan kirim ke WebApp,
+          lalu Apps Script yang ambil <b>judul &amp; gambar</b> dan simpan ke Sheet.
         </p>
         <textarea
           id="shopee-input"
@@ -171,29 +170,19 @@
     <!-- PANEL TIKTOK -->
     <div id="panel-tiktok" class="panel">
       <div class="box">
-        <h2>🎵 Tambah TikTok (Batch H–N)</h2>
-        <p>Link TikTok (1 per baris):</p>
-        <textarea
-          id="tiktok-links"
-          placeholder="https://www.tiktok.com/....&#10;https://vt.tiktok.com/..."
-        ></textarea>
-
+        <h2>🎵 Tambah TikTok (Batch)</h2>
         <p>
-          Judul (opsional, 1 per baris – jika kosong akan diisi
-          <b>&quot;Produk&quot;</b>):
+          Bagian TikTok belum disambung ke Apps Script yang baru.
+          Nanti kalau sudah siap endpoint-nya, kita sambungin lagi.
         </p>
         <textarea
-          id="tiktok-titles"
-          placeholder="Nama produk 1&#10;Nama produk 2"
+          id="tiktok-links"
+          placeholder="(belum aktif)"
+          disabled
         ></textarea>
-
-        <p>URL gambar (opsional, 1 per baris – boleh dikosongkan):</p>
-        <textarea
-          id="tiktok-images"
-          placeholder="https://...jpg&#10;https://...jpg"
-        ></textarea>
-
-        <button onclick="sendTikTok()">Tambah Produk TikTok</button>
+        <button onclick="alert('Endpoint TikTok belum diset di Code.gs, bro. Nanti kita sambungin kalau sudah siap.')">
+          Coming soon
+        </button>
       </div>
     </div>
 
@@ -203,8 +192,7 @@
   </div>
 
   <script>
-    // ⚠️ PASTIKAN INI SAMA PERSIS DENGAN SCRIPT LAMA YANG SUDAH JALAN
-    // (copy dari admin lama yang jadul tapi sukses nulis ke Sheet)
+    // ✅ ini sudah pakai URL WebApp yang kamu sebut
     const WEBAPP_URL =
       "https://script.google.com/macros/s/AKfycbzRz67r35i87LMaa1LQY8iXEGml1tXifHIPvbE2ui006afojMmGswS3ipzAC27dOB9G/exec";
 
@@ -221,52 +209,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // ============ Shopee: ambil meta (judul + gambar) ============
-    async function fetchShopeeMeta(url) {
-      try {
-        // Proxy sederhana untuk bypass CORS
-        const proxied = "https://cors.isomorphic-git.org/" + url;
-        const resp = await fetch(proxied);
-        const html = await resp.text();
-
-        let title = "Produk";
-        let image = "";
-
-        // 1. Coba OG:title
-        const t = html.match(
-          /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i
-        );
-        if (t && t[1]) {
-          title = t[1];
-        } else {
-          // 2. Fallback: <title>...</title>
-          const t2 = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-          if (t2 && t2[1]) {
-            title = t2[1];
-          }
-        }
-
-        // 3. OG:image
-        const i = html.match(
-          /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
-        );
-        if (i && i[1]) {
-          image = i[1];
-        } else {
-          // 4. Fallback: cari url img.susercontent.com/file/...
-          const i2 = html.match(/https?:\/\/[^\s"']*img\.susercontent\.com\/file\/[^\s"'<>]+/i);
-          if (i2 && i2[0]) {
-            image = i2[0];
-          }
-        }
-
-        return { title, image };
-      } catch (err) {
-        console.log("Gagal fetch Shopee meta:", err);
-        return { title: "Produk", image: "" };
-      }
-    }
-
+    // ============ Shopee: kirim list link ke WebApp via POST JSON ============
     async function sendShopee() {
       const raw = document.getElementById("shopee-input").value.trim();
       const logBox = document.getElementById("log");
@@ -283,72 +226,33 @@
         .map((x) => x.trim())
         .filter(Boolean);
 
-      let idx = 0;
-
-      for (const link of links) {
-        idx++;
-        log("[" + idx + "/" + links.length + "] Ambil meta: " + link);
-
-        const meta = await fetchShopeeMeta(link);
-        log("   → title: " + meta.title);
-
-        const qs = new URLSearchParams({
-          link: link,
-          title: meta.title || "Produk",
-          image: meta.image || "",
-          no: "",
-          source: "shopee",
-        });
-
-        const url = WEBAPP_URL + "?" + qs.toString();
-
-        try {
-          const res = await fetch(url);
-          const txt = await res.text();
-          log("   ✔ Disimpan → " + txt);
-        } catch (err) {
-          log("   ✖ Gagal simpan: " + err + " (URL: " + url + ")");
-        }
-
-        // delay dikit biar Apps Script & proxy gak keteteran
-        await new Promise((r) => setTimeout(r, 400));
-      }
-
-      log("\n🎉 Selesai tambah Shopee.");
-    }
-
-    // ============ TikTok batch (handleBatch di Apps Script) ============
-    async function sendTikTok() {
-      const links = document.getElementById("tiktok-links").value.trim();
-      const titles = document.getElementById("tiktok-titles").value.trim();
-      const images = document.getElementById("tiktok-images").value.trim();
-      const logBox = document.getElementById("log");
-      logBox.textContent = "⏳ Mulai proses TikTok...\n";
-
-      if (!links) {
-        alert("Isi minimal link TikTok dulu, bro.");
+      if (!links.length) {
+        alert("Nggak ada link valid.");
         return;
       }
 
-      const qs = new URLSearchParams({
-        mode: "batch",
-        source: "tiktok",
-        links,
-        titles,
-        images,
-      });
-
-      const url = WEBAPP_URL + "?" + qs.toString();
+      log("Total link: " + links.length);
 
       try {
-        const res = await fetch(url);
-        const txt = await res.text();
-        log("✔ TikTok batch → " + txt);
+        // TANPA set Content-Type → browser pakai text/plain (simple CORS, no preflight)
+        const res = await fetch(WEBAPP_URL, {
+          method: "POST",
+          body: JSON.stringify({ links })
+        });
+
+        let txt;
+        try {
+          const data = await res.json();
+          txt = JSON.stringify(data);
+        } catch (_) {
+          txt = await res.text();
+        }
+        log("✔ Respon WebApp: " + txt);
       } catch (err) {
-        log("✖ ERROR TikTok: " + err + " (URL: " + url + ")");
+        log("✖ Gagal kirim ke WebApp: " + err);
       }
 
-      log("\n🎉 Selesai TikTok.");
+      log("\n🎉 Selesai, cek sheet 'data' apakah baris baru sudah masuk.");
     }
   </script>
 </body>
